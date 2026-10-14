@@ -2,12 +2,9 @@ import SwiftData
 import SwiftUI
 
 /// iOS-style bulk delete for a list: Select / Done, Select All, Delete (N) with confirmation.
-/// Swipe-to-delete on a row asks through `pendingDelete`; the toolbar button has its own dialog.
 struct SelectionToolbar: ViewModifier {
     @Binding var editMode: EditMode
     @Binding var selection: Set<PersistentIdentifier>
-    /// Items waiting for confirmation; nil when nothing is pending.
-    @Binding var pendingDelete: Set<PersistentIdentifier>?
     let allIDs: [PersistentIdentifier]
     let confirmationTitle: (Int) -> Text
     let delete: (Set<PersistentIdentifier>) -> Void
@@ -43,14 +40,6 @@ struct SelectionToolbar: ViewModifier {
                     }
                 }
             }
-            .confirmationDialog(
-                confirmationTitle(pendingDelete?.count ?? 0),
-                isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
-                titleVisibility: .visible,
-                presenting: pendingDelete
-            ) { ids in
-                Button("Delete", role: .destructive) { confirmDelete(ids) }
-            }
             .onChange(of: allIDs) { selection.formIntersection($1) }
             // Set last so the list and everything around it share one edit mode.
             .environment(\.editMode, $editMode)
@@ -74,13 +63,12 @@ extension View {
     func selectionToolbar(
         editMode: Binding<EditMode>,
         selection: Binding<Set<PersistentIdentifier>>,
-        pendingDelete: Binding<Set<PersistentIdentifier>?>,
         allIDs: [PersistentIdentifier],
         confirmationTitle: @escaping (Int) -> Text,
         delete: @escaping (Set<PersistentIdentifier>) -> Void
     ) -> some View {
         modifier(SelectionToolbar(
-            editMode: editMode, selection: selection, pendingDelete: pendingDelete,
+            editMode: editMode, selection: selection,
             allIDs: allIDs, confirmationTitle: confirmationTitle, delete: delete
         ))
     }

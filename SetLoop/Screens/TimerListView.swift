@@ -10,7 +10,8 @@ struct TimerListView: View {
 
     @State private var editMode = EditMode.inactive
     @State private var selection = Set<PersistentIdentifier>()
-    @State private var pendingDelete: Set<PersistentIdentifier>?
+    /// The row whose delete confirmation is showing.
+    @State private var pendingDelete: PersistentIdentifier?
     @State private var editor: EditorTarget?
     @State private var limitReached = false
 
@@ -23,7 +24,7 @@ struct TimerListView: View {
                         .swipeActions {
                             // No destructive role: it would remove the row before the confirmation.
                             Button("Delete", systemImage: "trash") {
-                                pendingDelete = [timer.persistentModelID]
+                                pendingDelete = timer.persistentModelID
                             }
                             .tint(.red)
                             Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(timer) }
@@ -35,8 +36,21 @@ struct TimerListView: View {
                             Button("Edit", systemImage: "pencil") { editor = .edit(timer) }
                             Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(timer) }
                             Button("Delete", systemImage: "trash", role: .destructive) {
-                                pendingDelete = [timer.persistentModelID]
+                                pendingDelete = timer.persistentModelID
                             }
+                        }
+                        // On the row, so the iOS 26+ popover points at the timer being deleted.
+                        .confirmationDialog(
+                            "Delete this timer?",
+                            isPresented: Binding(
+                                get: { pendingDelete == timer.persistentModelID },
+                                set: { if !$0 { pendingDelete = nil } }
+                            ),
+                            titleVisibility: .visible
+                        ) {
+                            Button("Delete", role: .destructive) { context.delete(ids: [timer.persistentModelID]) }
+                        } message: {
+                            Text("Workouts in History stay.")
                         }
                 }
                 .onMove(perform: move)
@@ -66,7 +80,6 @@ struct TimerListView: View {
             .selectionToolbar(
                 editMode: $editMode,
                 selection: $selection,
-                pendingDelete: $pendingDelete,
                 allIDs: timers.map(\.persistentModelID),
                 confirmationTitle: { Text("Delete \($0) timers?") },
                 delete: { context.delete(ids: $0) }
