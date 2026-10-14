@@ -20,13 +20,22 @@ struct SetLoopApp: App {
                 .environment(workout)
                 .preferredColorScheme(settings.theme.colorScheme)
         }
-        .modelContainer(for: [SavedTimer.self, WorkoutRecord.self]) { result in
-            if case .success(let container) = result {
-                PresetSeeder.seedIfNeeded(container.mainContext)
-                DefaultNames.relocalize(container.mainContext)
-            }
-        }
+        .modelContainer(Self.container)
     }
+
+    /// Created once: SwiftUI may build the App more than once.
+    private static let container: ModelContainer = {
+        let container: ModelContainer
+        do {
+            container = try ModelContainer(for: Schema(versionedSchema: SchemaV1.self),
+                                           migrationPlan: SetLoopMigrationPlan.self)
+        } catch {
+            fatalError("Can't open the store: \(error)")
+        }
+        PresetSeeder.seedIfNeeded(container.mainContext)
+        DefaultNames.relocalize(container.mainContext)
+        return container
+    }()
 }
 
 /// Creates the example timers once, on first launch (SPEC D9).
