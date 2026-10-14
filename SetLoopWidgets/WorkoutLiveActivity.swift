@@ -7,7 +7,7 @@ import WidgetKit
 struct WorkoutLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: WorkoutActivityAttributes.self) { context in
-            LockScreenView(state: context.state, timerName: context.attributes.timerName)
+            LockScreenView(state: context.state, timerName: context.attributes.timerName, isStale: context.isStale)
                 .activityBackgroundTint(context.state.color.color)
                 .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
@@ -49,6 +49,8 @@ struct WorkoutLiveActivity: Widget {
 private struct LockScreenView: View {
     let state: WorkoutActivityAttributes.ContentState
     let timerName: String
+    /// The step ended, but the app hasn't updated the activity: it is frozen in the background.
+    let isStale: Bool
 
     var body: some View {
         // The lock screen card is limited to ~160 pt: header, one row with texts and digits,
@@ -61,8 +63,13 @@ private struct LockScreenView: View {
             }
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 2) {
-                    if !state.positionText.isEmpty { Text(state.positionText) }
-                    if let next = state.nextText { Text(next) }
+                    // In place of the position lines, so the card keeps its height.
+                    if isStale {
+                        Text("Open SetLoop to continue").lineLimit(2)
+                    } else {
+                        if !state.positionText.isEmpty { Text(state.positionText) }
+                        if let next = state.nextText { Text(next) }
+                    }
                 }
                 .font(.footnote)
                 .lineLimit(1)

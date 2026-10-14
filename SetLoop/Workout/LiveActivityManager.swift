@@ -21,13 +21,14 @@ final class LiveActivityManager {
         guard let state, ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         activityID = try? Activity.request(
             attributes: WorkoutActivityAttributes(timerName: timerName.cappedName),
-            content: .init(state: state, staleDate: nil)
+            content: Self.content(state)
         ).id
     }
 
     func update(_ state: WorkoutActivityAttributes.ContentState?) {
         guard let activityID, let state else { return }
-        enqueue { await Self.activity(activityID)?.update(.init(state: state, staleDate: nil)) }
+        let content = Self.content(state)
+        enqueue { await Self.activity(activityID)?.update(content) }
     }
 
     func end() {
@@ -48,6 +49,12 @@ final class LiveActivityManager {
             await previous?.value
             await work()
         }
+    }
+
+    /// A running step goes stale when it ends: without sound the app may be frozen and miss the change.
+    /// The grace keeps a normal update at the step end from flashing the stale look.
+    private static func content(_ state: WorkoutActivityAttributes.ContentState) -> ActivityContent<WorkoutActivityAttributes.ContentState> {
+        .init(state: state, staleDate: state.stepEnd?.addingTimeInterval(2))
     }
 
     /// Ends the activities that exist right now. The IDs are taken synchronously, so an activity
