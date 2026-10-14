@@ -49,7 +49,7 @@ final class AppSettings {
             Key.vibration: true,
             Key.voicePrompts: false,
             Key.ignoreSilentMode: true,
-            Key.soundSet: SoundSet.classic.rawValue,
+            Key.soundSet: SoundSet.glass.rawValue,
         ])
         pauseOnInterruption = defaults.bool(forKey: Key.pauseOnInterruption)
         showOnLockScreen = defaults.bool(forKey: Key.showOnLockScreen)
@@ -57,7 +57,9 @@ final class AppSettings {
         vibration = defaults.bool(forKey: Key.vibration)
         voicePrompts = defaults.bool(forKey: Key.voicePrompts)
         ignoreSilentMode = defaults.bool(forKey: Key.ignoreSilentMode)
-        soundSet = defaults.string(forKey: Key.soundSet).flatMap(SoundSet.init)
+        // A set that no longer exists falls back to the default rather than to Off.
+        let storedSet = defaults.string(forKey: Key.soundSet)
+        soundSet = storedSet == Self.off ? nil : storedSet.flatMap(SoundSet.init) ?? .glass
         theme = defaults.string(forKey: Key.theme).flatMap(Theme.init) ?? .system
         stepColors = defaults.data(forKey: Key.stepColors)
             .flatMap { try? JSONDecoder().decode(StepColors.self, from: $0) } ?? .default

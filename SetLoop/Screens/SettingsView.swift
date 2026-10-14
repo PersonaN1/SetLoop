@@ -76,10 +76,9 @@ enum SupportLinks {
 extension SoundSet {
     var title: String {
         switch self {
-        case .classic: String(localized: "Classic")
-        case .soft: String(localized: "Soft")
-        case .sharp: String(localized: "Sharp")
-        case .whistle: String(localized: "Whistle")
+        case .glass: String(localized: "Glass")
+        case .marimba: String(localized: "Marimba")
+        case .note: String(localized: "Note")
         }
     }
 }

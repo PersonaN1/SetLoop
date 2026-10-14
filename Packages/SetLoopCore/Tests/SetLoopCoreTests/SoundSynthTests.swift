@@ -15,9 +15,11 @@ struct SoundSynthTests {
     }
 
     @Test func countdownIsShortAndFinishIsLongest() {
-        let length = { (cue: SoundCue) in Double(SoundSynth.samples(cue, in: .classic).count) / SoundSynth.sampleRate }
-        #expect(length(.countdown) < 0.2)
-        #expect(length(.finish) > length(.work))
+        for set in SoundSet.allCases {
+            let length = { (cue: SoundCue) in SoundSynth.samples(cue, in: set).count }
+            #expect(length(.countdown) < length(.work), "\(set)")
+            #expect(length(.finish) > length(.work), "\(set)")
+        }
     }
 
     @Test func stepTypesMapToCues() {

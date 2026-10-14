@@ -14,10 +14,13 @@ final class WorkoutAudio {
     private let settings: AppSettings
     private let session = AVAudioSession.sharedInstance()
     private let engine = AVAudioEngine()
-    private let player = AVAudioPlayerNode()
+    /// Ticks and step signals overlap: a tick must not cut the step sound's tail.
+    private let tickPlayer = AVAudioPlayerNode()
+    private let stepPlayer = AVAudioPlayerNode()
     private let format = AVAudioFormat(standardFormatWithSampleRate: SoundSynth.sampleRate, channels: 1)!
     private let speech = AVSpeechSynthesizer()
     private var buffers: [String: AVAudioPCMBuffer] = [:]
+    private var players: [AVAudioPlayerNode] { [tickPlayer, stepPlayer] }
     private var observers: [NSObjectProtocol] = []
 
     private var isActive = false
@@ -27,8 +30,10 @@ final class WorkoutAudio {
 
     init(settings: AppSettings) {
         self.settings = settings
-        engine.attach(player)
-        engine.connect(player, to: engine.mainMixerNode, format: format)
+        for player in players {
+            engine.attach(player)
+            engine.connect(player, to: engine.mainMixerNode, format: format)
+        }
         observe()
     }
 
@@ -40,6 +45,8 @@ final class WorkoutAudio {
         guard settings.soundSet != nil || settings.voicePrompts else { return end() }
         isActive = true
         configure(ducked: false)
+        // Rendering takes a moment; do it before the first signal, not on it.
+        if let set = settings.soundSet { SoundCue.allCases.forEach { _ = buffer($0, set) } }
     }
 
     func end() {
@@ -49,7 +56,7 @@ final class WorkoutAudio {
         isActive = false
         isDucked = false
         speech.stopSpeaking(at: .immediate)
-        player.stop()
+        players.forEach { $0.stop() }
         engine.stop()
         try? session.setActive(false, options: .notifyOthersOnDeactivation)
     }
@@ -113,6 +120,7 @@ final class WorkoutAudio {
         guard isActive, let set = set ?? settings.soundSet else { return 0 }
         duck()
         let buffer = buffer(cue, set)
+        let player = cue == .countdown ? tickPlayer : stepPlayer
         player.scheduleBuffer(buffer, at: nil, options: .interrupts)
         if !player.isPlaying { player.play() }
         let length = TimeInterval(buffer.frameLength) / SoundSynth.sampleRate
@@ -184,7 +192,7 @@ final class WorkoutAudio {
         let ignoreSilent = settings.ignoreSilentMode
         let wasRunning = engine.isRunning
         if wasRunning {
-            player.stop()
+            players.forEach { $0.stop() }
             engine.stop()
             try? session.setActive(false)
         }
@@ -196,7 +204,7 @@ final class WorkoutAudio {
             }
             try session.setActive(true)
             try engine.start()
-            player.play()
+            players.forEach { $0.play() }
             isDucked = ducked && ignoreSilent
         } catch {
             isDucked = false

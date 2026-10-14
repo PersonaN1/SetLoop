@@ -1,8 +1,8 @@
 import Foundation
 
-/// Built-in sound sets (SPEC D5, TECH T6).
+/// Built-in sound sets (SPEC D5, TECH T6), picked by ear on the tone lab page.
 public enum SoundSet: String, CaseIterable, Codable, Sendable {
-    case classic, soft, sharp, whistle
+    case glass, marimba, note
 }
 
 /// What a signal announces. The step sound depends on the step type, not on the step.
@@ -18,7 +18,8 @@ public enum SoundCue: CaseIterable, Sendable {
     }
 }
 
-/// Synthesizes the signals in code: no audio files, no licenses, equal loudness across sets (TECH T6).
+/// Synthesizes the signals in code in the style of iOS system sounds: soft attack, natural decay,
+/// mid register and a little room (TECH T6). No audio files, no licenses.
 public enum SoundSynth {
     public static let sampleRate = 44_100.0
     /// Peak level of every sound, leaving headroom for the mixer.
@@ -26,16 +27,24 @@ public enum SoundSynth {
 
     /// Mono samples at `sampleRate`, normalized to `peak`.
     public static func samples(_ cue: SoundCue, in set: SoundSet) -> [Float] {
-        let notes = notes(cue, base: set.baseFrequency)
-        let length = notes.map { $0.start + $0.duration }.max() ?? 0
-        var output = [Float](repeating: 0, count: Int(length * sampleRate) + 1)
+        let (voice, notes) = set.score(cue)
+        return render(voice, notes)
+    }
+
+    static func render(_ voice: Voice, _ notes: [(frequency: Double, start: TimeInterval)]) -> [Float] {
+        let length = (notes.map(\.start).max() ?? 0) + voice.length
+        var dry = [Float](repeating: 0, count: Int((length * sampleRate).rounded(.up)))
         for note in notes {
-            let first = Int(note.start * sampleRate)
-            let count = Int(note.duration * sampleRate)
-            for i in 0..<count where first + i < output.count {
-                let t = Double(i) / sampleRate
-                output[first + i] += Float(set.wave(note.frequency, t) * set.envelope(t, note.duration))
+            let first = Int((note.start * sampleRate).rounded())
+            for i in 0..<max(dry.count - first, 0) {
+                dry[first + i] += Float(voice.sample(note.frequency, Double(i) / sampleRate))
             }
+        }
+        var output = reverb(dry)
+        // A cut tail never clicks.
+        let fade = Int(0.15 * sampleRate)
+        for i in 0..<min(fade, output.count) {
+            output[output.count - 1 - i] *= Float(i) / Float(fade)
         }
         let maxLevel = output.map(abs).max() ?? 0
         guard maxLevel > 0 else { return output }
@@ -43,63 +52,86 @@ public enum SoundSynth {
         return output.map { $0 * gain }
     }
 
-    struct Note {
-        var frequency: Double
-        var start: TimeInterval
-        var duration: TimeInterval
+    /// Small Schroeder reverb: 4 combs and 2 allpasses, 18 % wet, 0.4 s tail.
+    static func reverb(_ x: [Float]) -> [Float] {
+        let n = x.count + Int(0.4 * sampleRate)
+        var wet = [Float](repeating: 0, count: n)
+        for delay in [1116, 1188, 1277, 1356] {
+            var buffer = [Float](repeating: 0, count: delay)
+            var index = 0
+            for k in 0..<n {
+                let out = buffer[index]
+                buffer[index] = (k < x.count ? x[k] : 0) + out * 0.72
+                index = (index + 1) % delay
+                wet[k] += out / 4
+            }
+        }
+        for delay in [556, 441] {
+            var buffer = [Float](repeating: 0, count: delay)
+            var index = 0
+            for k in 0..<n {
+                let stored = buffer[index], input = wet[k]
+                buffer[index] = input + stored * 0.5
+                index = (index + 1) % delay
+                wet[k] = stored - input
+            }
+        }
+        return (0..<n).map { k in (k < x.count ? x[k] : 0) + 0.18 * wet[k] }
     }
 
-    /// Work goes up, rest goes down, prepare/cooldown in between, finish is a rising run.
-    static func notes(_ cue: SoundCue, base: Double) -> [Note] {
-        switch cue {
-        case .countdown:
-            [Note(frequency: base, start: 0, duration: 0.12)]
-        case .work:
-            [Note(frequency: base * 1.5, start: 0, duration: 0.6)]
-        case .rest:
-            [Note(frequency: base * 0.75, start: 0, duration: 0.6)]
-        case .other:
-            [Note(frequency: base, start: 0, duration: 0.15), Note(frequency: base * 1.25, start: 0.18, duration: 0.4)]
-        case .finish:
-            [1, 1.25, 1.5].enumerated().map { Note(frequency: base * $1, start: Double($0) * 0.16, duration: 0.15) }
-                + [Note(frequency: base * 2, start: 0.48, duration: 0.7)]
+    /// A sum of decaying partials, with an optional pitch drop at the start (woodblock).
+    struct Voice {
+        /// Frequency ratio, amplitude, decay time constant in seconds.
+        var partials: [(ratio: Double, amplitude: Double, decay: Double)]
+        var attack: Double
+        var drop: Double = 0
+
+        /// Until about -40 dB, at most 2.5 s; the reverb adds its own tail.
+        var length: TimeInterval { min(2.5, (partials.map(\.decay).max() ?? 0) * 4.6) }
+
+        func sample(_ frequency: Double, _ t: TimeInterval) -> Double {
+            let pitch = drop > 0 ? frequency * (1 + drop * exp(-t / 0.005)) : frequency
+            let sum = partials.reduce(0) { sum, p in
+                sum + p.amplitude * exp(-t / p.decay) * sin(2 * .pi * pitch * p.ratio * t)
+            }
+            return min(1, t / attack) * sum
         }
+
+        static let glass = Voice(partials: [(1, 1, 0.9), (2.76, 0.3, 0.25), (5.4, 0.12, 0.1), (8.9, 0.05, 0.05)], attack: 0.003)
+        static let marimba = Voice(partials: [(1, 1, 0.4), (3.93, 0.3, 0.06), (9.2, 0.06, 0.02)], attack: 0.002)
+        static let note = Voice(partials: [(1, 1, 0.45), (2, 0.35, 0.2), (3, 0.1, 0.1)], attack: 0.006)
+        static let tink = Voice(partials: [(1, 1, 0.12), (2.76, 0.3, 0.04)], attack: 0.001)
+        static let wood = Voice(partials: [(1, 1, 0.035), (2.6, 0.4, 0.015)], attack: 0.001, drop: 0.3)
+        static let tock = Voice(partials: [(1, 1, 0.05), (2, 0.15, 0.02)], attack: 0.001)
+    }
+
+    enum Pitch {
+        static let a4 = 440.0, c5 = 523.25, cSharp5 = 554.37, e5 = 659.25, g5 = 783.99, a5 = 880.0, c6 = 1046.5
     }
 }
 
 extension SoundSet {
-    var baseFrequency: Double {
-        switch self {
-        case .classic: 880
-        case .soft: 660
-        case .sharp: 1000
-        case .whistle: 1800
-        }
-    }
+    /// Work goes up, rest goes down, finish is a rising run.
+    func score(_ cue: SoundCue) -> (SoundSynth.Voice, [(frequency: Double, start: TimeInterval)]) {
+        typealias P = SoundSynth.Pitch
+        switch (self, cue) {
+        case (.glass, .countdown): return (.tink, [(1319, 0)])
+        case (.glass, .work): return (.glass, [(P.e5, 0), (P.a5, 0.11)])
+        case (.glass, .rest): return (.glass, [(P.a5, 0), (P.e5, 0.11)])
+        case (.glass, .other): return (.glass, [(P.g5, 0)])
+        case (.glass, .finish): return (.glass, [(P.c5, 0), (P.e5, 0.12), (P.g5, 0.24), (P.c6, 0.36)])
 
-    func wave(_ frequency: Double, _ t: TimeInterval) -> Double {
-        let phase = 2 * .pi * frequency * t
-        switch self {
-        case .classic:
-            return sin(phase)
-        case .soft:
-            // A touch of octave gives a mallet-like tone.
-            return sin(phase) + 0.25 * sin(2 * phase)
-        case .sharp:
-            // Odd harmonics up to the 9th: square-ish, without aliasing.
-            return stride(from: 1, through: 9, by: 2).reduce(0) { $0 + sin(Double($1) * phase) / Double($1) }
-        case .whistle:
-            // 7 Hz vibrato of ±2 %.
-            let vibrato = 0.02 * frequency / 7 * sin(2 * .pi * 7 * t)
-            return sin(phase + 2 * .pi * vibrato)
-        }
-    }
+        case (.marimba, .countdown): return (.wood, [(1100, 0)])
+        case (.marimba, .work): return (.marimba, [(P.c5, 0), (P.g5, 0.1)])
+        case (.marimba, .rest): return (.marimba, [(P.g5, 0), (P.c5, 0.1)])
+        case (.marimba, .other): return (.marimba, [(P.e5, 0)])
+        case (.marimba, .finish): return (.marimba, [(P.c5, 0), (P.e5, 0.1), (P.g5, 0.2), (P.c6, 0.3)])
 
-    /// Short fades on both ends avoid clicks; the soft set decays like a struck bar.
-    func envelope(_ t: TimeInterval, _ duration: TimeInterval) -> Double {
-        let attack = self == .whistle ? 0.02 : 0.004
-        let release = 0.03
-        let edges = min(1, t / attack, max(0, duration - t) / release)
-        return self == .soft ? edges * exp(-t / (duration * 0.35)) : edges
+        case (.note, .countdown): return (.tock, [(800, 0)])
+        case (.note, .work): return (.note, [(P.a4, 0), (P.e5, 0.14)])
+        case (.note, .rest): return (.note, [(P.e5, 0), (P.a4, 0.14)])
+        case (.note, .other): return (.note, [(P.c5, 0)])
+        case (.note, .finish): return (.note, [(P.a4, 0), (P.cSharp5, 0.12), (P.e5, 0.24), (P.a5, 0.36)])
+        }
     }
 }
