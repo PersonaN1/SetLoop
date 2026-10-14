@@ -4,12 +4,21 @@ import SwiftUI
 
 @main
 struct SetLoopApp: App {
-    @State private var workout = WorkoutController()
+    @State private var settings: AppSettings
+    @State private var workout: WorkoutController
+
+    init() {
+        let settings = AppSettings()
+        _settings = State(initialValue: settings)
+        _workout = State(initialValue: WorkoutController(settings: settings))
+    }
 
     var body: some Scene {
         WindowGroup {
             RootView()
+                .environment(settings)
                 .environment(workout)
+                .preferredColorScheme(settings.theme.colorScheme)
         }
         .modelContainer(for: [SavedTimer.self, WorkoutRecord.self]) { result in
             if case .success(let container) = result {

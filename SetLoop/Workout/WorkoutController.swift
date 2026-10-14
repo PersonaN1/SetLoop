@@ -1,6 +1,7 @@
 import Foundation
 import Observation
 import SetLoopCore
+import UIKit
 
 /// The single running workout: drives the engine, Live Activity and (later) sound, haptics and interruptions (TECH T4, T9).
 @MainActor
@@ -11,14 +12,16 @@ final class WorkoutController {
     /// Kept for the history record, so "Repeat" works after the timer is edited or deleted.
     private(set) var definition = TimerDefinition(blocks: [])
     private(set) var startedAt = Date.now
-    var colors = StepColors.default
+    let settings: AppSettings
+    var colors: StepColors { settings.stepColors }
 
     private let clock = ContinuousClock()
     private let origin: ContinuousClock.Instant
     private var cueTask: Task<Void, Never>?
     private let liveActivity = LiveActivityManager()
 
-    init() {
+    init(settings: AppSettings) {
+        self.settings = settings
         origin = clock.now
     }
 
@@ -47,7 +50,11 @@ final class WorkoutController {
         self.definition = definition
         timerName = name
         startedAt = .now
-        liveActivity.start(timerName: name, state: activityState())
+        if settings.showOnLockScreen {
+            liveActivity.start(timerName: name, state: activityState())
+        }
+        // Only matters while the app is in front (SPEC D7).
+        UIApplication.shared.isIdleTimerDisabled = settings.keepScreenOn
         scheduleNextCue()
     }
 
@@ -63,6 +70,7 @@ final class WorkoutController {
         cueTask?.cancel()
         engine = nil
         liveActivity.end()
+        UIApplication.shared.isIdleTimerDisabled = false
     }
 
     // MARK: - Private
@@ -78,6 +86,7 @@ final class WorkoutController {
         if case .finished = engine?.phase {
             cueTask?.cancel()
             liveActivity.end()
+            UIApplication.shared.isIdleTimerDisabled = false
         } else {
             liveActivity.update(activityState())
             scheduleNextCue()
