@@ -147,3 +147,26 @@ func step(_ duration: Int, _ type: StepType = .workA) -> Step {
         #expect(TimerDefinition(blocks: [Block(steps: [step(5, .rest)])], skipLastRest: true).stepCount == 0)
     }
 }
+
+@Suite struct StepColorsCodingTests {
+    @Test func roundTripsAsKeyedObject() throws {
+        var colors = StepColors.default
+        colors.colors[.workB] = RGB(0x2F6BDB)
+        let data = try JSONEncoder().encode(colors)
+        let json = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        #expect(json["colors"] is [String: Any])
+        #expect(try JSONDecoder().decode(StepColors.self, from: data) == colors)
+    }
+
+    @Test func readsKeyedObjectSkippingUnknownTypes() throws {
+        let json = #"{"colors": {"workA": {"hex": 3107803}, "workD": {"hex": 1}}}"#
+        let colors = try JSONDecoder().decode(StepColors.self, from: Data(json.utf8))
+        #expect(colors.colors == [.workA: RGB(0x2F6BDB)])
+    }
+
+    @Test func readsLegacyFlatArraySkippingUnknownTypes() throws {
+        let json = #"{"colors": ["rest", {"hex": 3107803}, "workD", {"hex": 1}, "workA", {"hex": 15222060}]}"#
+        let colors = try JSONDecoder().decode(StepColors.self, from: Data(json.utf8))
+        #expect(colors.colors == [.rest: RGB(0x2F6BDB), .workA: RGB(0xE8452C)])
+    }
+}

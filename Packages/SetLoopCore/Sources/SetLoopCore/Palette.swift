@@ -40,6 +40,10 @@ public enum Palette {
 public struct StepColors: Codable, Hashable, Sendable {
     public var colors: [StepType: RGB]
 
+    public init(colors: [StepType: RGB]) {
+        self.colors = colors
+    }
+
     public static let `default` = StepColors(colors: [
         .prepare: RGB(0x5B6470),
         .workA: RGB(0xE8452C),
@@ -60,6 +64,38 @@ public struct StepColors: Codable, Hashable, Sendable {
         case .rest: ![StepType.workA, .workB, .workC].contains { self[$0] == color }
         case .other: true
         }
+    }
+}
+
+/// Stored as `{"colors": {"workA": {"hex": …}}}`. Older builds wrote the enum-keyed dictionary
+/// as a flat `[key, value, key, value…]` array; both are read, and unknown types are skipped.
+extension StepColors {
+    private enum CodingKeys: String, CodingKey {
+        case colors
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        var colors: [StepType: RGB] = [:]
+        if let keyed = try? container.decode([String: RGB].self, forKey: .colors) {
+            for (key, color) in keyed {
+                if let type = StepType(rawValue: key) { colors[type] = color }
+            }
+        } else {
+            var legacy = try container.nestedUnkeyedContainer(forKey: .colors)
+            while !legacy.isAtEnd {
+                let key = try legacy.decode(String.self)
+                let color = try legacy.decode(RGB.self)
+                if let type = StepType(rawValue: key) { colors[type] = color }
+            }
+        }
+        self.colors = colors
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        let keyed = Dictionary(uniqueKeysWithValues: colors.map { ($0.key.rawValue, $0.value) })
+        try container.encode(keyed, forKey: .colors)
     }
 }
 
