@@ -4,7 +4,6 @@ import SwiftUI
 /// Full-screen workout, filled with the step color (SPEC D4, DESIGN V1).
 struct WorkoutView: View {
     @Environment(WorkoutController.self) private var workout
-    @State private var confirmingFinish = false
 
     var body: some View {
         if let summary = workout.summary {
@@ -25,53 +24,57 @@ struct WorkoutView: View {
         ZStack {
             (step.map { workout.colors[$0.type].color } ?? Color.black)
                 .ignoresSafeArea()
-            VStack(spacing: 16) {
+            VStack(spacing: 0) {
+                // Equal fillers keep the timer centered; Finish sits midway between the controls and the bottom.
+                Color.clear.frame(maxHeight: .infinity)
                 if let step {
-                    Text(step.step.name).font(.title.weight(.semibold))
-                    Text(WorkoutFormat.time(engine.stepRemaining(at: now)))
-                        .font(.system(size: 120, weight: .bold, design: .rounded))
-                        .monospacedDigit()
-                        .minimumScaleFactor(0.5)
-                    // Both lines keep their height when empty (a space), so the controls below never jump.
-                    Text(nonEmpty(WorkoutFormat.position(step.position))).font(.headline)
-                    Text(nonEmpty(engine.nextStep.map { WorkoutFormat.next($0) })).font(.subheadline)
-                    controls(engine)
+                    VStack(spacing: 16) {
+                        Text(step.step.name).font(.title.weight(.semibold))
+                        Text(WorkoutFormat.time(engine.stepRemaining(at: now)))
+                            .font(.system(size: 120, weight: .bold, design: .rounded))
+                            .monospacedDigit()
+                            .minimumScaleFactor(0.5)
+                        // Both lines keep their height when empty (a space), so the controls below never jump.
+                        Text(nonEmpty(WorkoutFormat.position(step.position))).font(.headline)
+                        Text(nonEmpty(engine.nextStep.map { WorkoutFormat.next($0) })).font(.subheadline)
+                        controls(engine)
+                    }
+                    // The fillers only get what is left, so the digits never shrink for them.
+                    .layoutPriority(1)
                 }
+                Color.clear.frame(maxHeight: .infinity)
+                    .overlay { finishButton }
             }
             .foregroundStyle(.white)
+            .tint(.white)
             .padding()
         }
     }
 
+    // The row never changes layout, so a button never moves under the finger.
     private func controls(_ engine: WorkoutEngine) -> some View {
-        VStack(spacing: 40) {
-            // The row never changes layout, so a button never moves under the finger.
-            HStack(spacing: 40) {
-                Button { workout.back() } label: { controlIcon("backward.end.fill") }
-                    .accessibilityLabel("Back")
-                Button { workout.togglePause() } label: {
-                    controlIcon(engine.phase == .paused ? "play.fill" : "pause.fill", size: 88)
-                }
-                .accessibilityLabel(engine.phase == .paused ? "Resume" : "Pause")
-                Button { workout.skip() } label: { controlIcon("forward.end.fill") }
-                    .accessibilityLabel("Skip")
+        HStack(spacing: 40) {
+            Button { workout.back() } label: { controlIcon("backward.end.fill") }
+                .accessibilityLabel("Back")
+            Button { workout.togglePause() } label: {
+                controlIcon(engine.phase == .paused ? "play.fill" : "pause.fill", size: 88)
             }
-            Button { confirmingFinish = true } label: {
-                Text("Finish")
-                    .font(.title3.weight(.semibold))
-                    .padding(.horizontal, 36)
-                    .frame(minHeight: 56)
-                    .background(.white.opacity(0.18), in: Capsule())
-                    .contentShape(Capsule())
-            }
-                // Finishing early needs confirmation and leads to the summary (SPEC D3).
-                .confirmationDialog("Finish the workout?", isPresented: $confirmingFinish, titleVisibility: .visible) {
-                    Button("Finish", role: .destructive) { workout.finish() }
-                } message: {
-                    Text("Remaining steps will not be recorded.")
-                }
+            .accessibilityLabel(engine.phase == .paused ? "Resume" : "Pause")
+            Button { workout.skip() } label: { controlIcon("forward.end.fill") }
+                .accessibilityLabel("Skip")
         }
-        .tint(.white)
+    }
+
+    /// No confirmation: the summary that follows still lets the user discard or save (SPEC D3).
+    private var finishButton: some View {
+        Button { workout.finish() } label: {
+            Text("Finish")
+                .font(.title3.weight(.semibold))
+                .padding(.horizontal, 36)
+                .frame(minHeight: 56)
+                .background(.white.opacity(0.18), in: Capsule())
+                .contentShape(Capsule())
+        }
     }
 
     private func nonEmpty(_ text: String?) -> String {
