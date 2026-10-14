@@ -44,7 +44,7 @@ struct WorkoutView: View {
     }
 
     private func controls(_ engine: WorkoutEngine) -> some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 40) {
             // The row never changes layout, so a button never moves under the finger.
             HStack(spacing: 40) {
                 Button { workout.back() } label: { controlIcon("backward.end.fill") }
@@ -56,19 +56,22 @@ struct WorkoutView: View {
                 Button { workout.skip() } label: { controlIcon("forward.end.fill") }
                     .accessibilityLabel("Skip")
             }
-            Button("Finish") { confirmingFinish = true }
-                .font(.headline)
-                .frame(minHeight: 44)
-                .opacity(engine.phase == .paused ? 1 : 0)
-                .disabled(engine.phase != .paused)
+            Button { confirmingFinish = true } label: {
+                Text("Finish")
+                    .font(.title3.weight(.semibold))
+                    .padding(.horizontal, 36)
+                    .frame(minHeight: 56)
+                    .background(.white.opacity(0.18), in: Capsule())
+                    .contentShape(Capsule())
+            }
+                // Finishing early needs confirmation and leads to the summary (SPEC D3).
+                .confirmationDialog("Finish the workout?", isPresented: $confirmingFinish, titleVisibility: .visible) {
+                    Button("Finish", role: .destructive) { workout.finish() }
+                } message: {
+                    Text("Remaining steps will not be recorded.")
+                }
         }
         .tint(.white)
-        // Finishing early needs confirmation and leads to the summary (SPEC D3).
-        .confirmationDialog("Finish the workout?", isPresented: $confirmingFinish, titleVisibility: .visible) {
-            Button("Finish", role: .destructive) { workout.finish() }
-        } message: {
-            Text("Remaining steps will not be recorded.")
-        }
     }
 
     private func nonEmpty(_ text: String?) -> String {
