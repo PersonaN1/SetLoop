@@ -36,8 +36,8 @@ public struct WorkoutSummary: Equatable, Sendable {
 extension Array where Element == StepRecord {
     public var completedCount: Int { filter { $0.outcome == .completed }.count }
 
-    /// Full durations of completed steps; skipped and interrupted steps do not count.
+    /// Time actually spent on steps of the category, including the part of a skipped or interrupted step.
     public func time(of category: StepType.Category) -> Int {
-        filter { $0.outcome == .completed && $0.step.type.category == category }.reduce(0) { $0 + $1.step.duration }
+        filter { $0.step.type.category == category }.reduce(0) { $0 + $1.elapsed }
     }
 }

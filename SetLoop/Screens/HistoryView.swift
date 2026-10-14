@@ -10,7 +10,6 @@ struct HistoryView: View {
 
     @State private var editMode = EditMode.inactive
     @State private var selection = Set<PersistentIdentifier>()
-    @State private var pendingDelete: Set<PersistentIdentifier>?
 
     var body: some View {
         NavigationStack {
@@ -25,6 +24,7 @@ struct HistoryView: View {
                                 .swipeActions {
                                     Button("Delete", systemImage: "trash", role: .destructive) {
                                         context.delete(record)
+                                        try? context.save()
                                     }
                                 }
                         }
@@ -47,7 +47,6 @@ struct HistoryView: View {
             .selectionToolbar(
                 editMode: $editMode,
                 selection: $selection,
-                pendingDelete: $pendingDelete,
                 allIDs: records.map(\.persistentModelID),
                 confirmationTitle: { Text("Delete \($0) workouts?") },
                 delete: { context.delete(ids: $0) }

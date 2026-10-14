@@ -38,6 +38,7 @@ enum PresetSeeder {
         for (index, preset) in Presets.all(names).enumerated() {
             context.insert(SavedTimer(name: preset.name, definition: preset.definition, sortIndex: index))
         }
+        try? context.save()
         UserDefaults.standard.set(true, forKey: key)
     }
 }

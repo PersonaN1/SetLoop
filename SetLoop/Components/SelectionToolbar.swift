@@ -2,15 +2,14 @@ import SwiftData
 import SwiftUI
 
 /// iOS-style bulk delete for a list: Select / Done, Select All, Delete (N) with confirmation.
-/// Swipe-to-delete on a row can reuse the same confirmation by setting `pendingDelete`.
 struct SelectionToolbar: ViewModifier {
     @Binding var editMode: EditMode
     @Binding var selection: Set<PersistentIdentifier>
-    /// Items waiting for confirmation; nil when nothing is pending.
-    @Binding var pendingDelete: Set<PersistentIdentifier>?
     let allIDs: [PersistentIdentifier]
     let confirmationTitle: (Int) -> Text
     let delete: (Set<PersistentIdentifier>) -> Void
+
+    @State private var confirmingSelection = false
 
     func body(content: Content) -> some View {
         content
@@ -28,29 +27,30 @@ struct SelectionToolbar: ViewModifier {
                     }
                     ToolbarItem(placement: .bottomBar) {
                         Button(role: .destructive) {
-                            pendingDelete = selection
+                            confirmingSelection = true
                         } label: {
                             Text("Delete (\(selection.count))")
                         }
                         .disabled(selection.isEmpty)
+                        // Its own dialog, so the iOS 26+ popover points at this button.
+                        .confirmationDialog(confirmationTitle(selection.count), isPresented: $confirmingSelection,
+                                            titleVisibility: .visible) {
+                            Button("Delete", role: .destructive) { confirmDelete(selection) }
+                        }
                     }
                 }
             }
-            .confirmationDialog(
-                confirmationTitle(pendingDelete?.count ?? 0),
-                isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }),
-                titleVisibility: .visible,
-                presenting: pendingDelete
-            ) { ids in
-                Button("Delete", role: .destructive) {
-                    delete(ids)
-                    selection.subtract(ids)
-                    if allIDs.count == ids.count { setEditing(false) }
-                }
-            }
+            // As in Files and Photos: the tab bar gives way to the selection actions.
+            .toolbar(editMode.isEditing ? .hidden : .automatic, for: .tabBar)
             .onChange(of: allIDs) { selection.formIntersection($1) }
             // Set last so the list and everything around it share one edit mode.
             .environment(\.editMode, $editMode)
+    }
+
+    private func confirmDelete(_ ids: Set<PersistentIdentifier>) {
+        delete(ids)
+        selection.subtract(ids)
+        if allIDs.count == ids.count { setEditing(false) }
     }
 
     private func setEditing(_ editing: Bool) {
@@ -65,13 +65,12 @@ extension View {
     func selectionToolbar(
         editMode: Binding<EditMode>,
         selection: Binding<Set<PersistentIdentifier>>,
-        pendingDelete: Binding<Set<PersistentIdentifier>?>,
         allIDs: [PersistentIdentifier],
         confirmationTitle: @escaping (Int) -> Text,
         delete: @escaping (Set<PersistentIdentifier>) -> Void
     ) -> some View {
         modifier(SelectionToolbar(
-            editMode: editMode, selection: selection, pendingDelete: pendingDelete,
+            editMode: editMode, selection: selection,
             allIDs: allIDs, confirmationTitle: confirmationTitle, delete: delete
         ))
     }
@@ -80,5 +79,6 @@ extension View {
 extension ModelContext {
     func delete(ids: Set<PersistentIdentifier>) {
         for id in ids { delete(model(for: id)) }
+        try? save()
     }
 }

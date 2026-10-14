@@ -35,6 +35,7 @@ struct RecordDetailView: View {
 
             Section {
                 TextField("Name", text: $record.name)
+                    .submitLabel(.done)
                 TextField("Note", text: $record.note, axis: .vertical)
             }
 
@@ -48,16 +49,19 @@ struct RecordDetailView: View {
                 Button("Repeat", systemImage: "arrow.clockwise") { repeatWorkout() }
                     .disabled(record.definition == nil || workout.isPresented)
                 Button("Delete Workout", systemImage: "trash", role: .destructive) { confirmingDelete = true }
+                    // Attached to the button so the iOS 26+ popover points at it.
+                    .confirmationDialog("Delete this workout?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+                        Button("Delete", role: .destructive) {
+                            context.delete(record)
+                            try? context.save()
+                            dismiss()
+                        }
+                    }
             }
         }
+        .scrollDismissesKeyboard(.immediately)
         .navigationTitle(record.name)
         .navigationBarTitleDisplayMode(.inline)
-        .confirmationDialog("Delete this workout?", isPresented: $confirmingDelete, titleVisibility: .visible) {
-            Button("Delete", role: .destructive) {
-                context.delete(record)
-                dismiss()
-            }
-        }
     }
 
     private func repeatWorkout() {
@@ -75,7 +79,12 @@ private struct StepRow: View {
             Circle().fill(color).frame(width: 10, height: 10)
             Text(record.step.name)
             Spacer()
-            Text(WorkoutFormat.duration(record.step.duration)).monospacedDigit().foregroundStyle(.secondary)
+            // Time actually spent; a step left early also shows its planned length.
+            Text(record.outcome == .completed
+                 ? WorkoutFormat.duration(record.elapsed)
+                 : "\(WorkoutFormat.duration(record.elapsed)) / \(WorkoutFormat.duration(record.step.duration))")
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
             outcome
         }
         .opacity(record.outcome == .skipped ? 0.5 : 1)
