@@ -102,3 +102,22 @@ private func step(_ name: String, _ type: StepType = .workA, _ duration: Int = 1
         #expect(TimerNaming.unique("Set (1)", among: ["Set (1)"]) == "Set (1) (2)")
     }
 }
+
+struct RenameStepsTests {
+    @Test func renamesEveryStepThatMatches() {
+        var definition = TimerDefinition(
+            prepare: Step(name: "Prepare", duration: 10, type: .prepare),
+            blocks: [Block(steps: [Step(name: "Work", duration: 20, type: .workA), Step(name: "Burpees", duration: 20, type: .workB)])],
+            sets: 2,
+            restBetweenSets: Step(name: "Rest", duration: 60, type: .rest),
+            cooldown: Step(name: "Cooldown", duration: 60, type: .cooldown)
+        )
+        let names = ["Prepare": "Подготовка", "Work": "Работа", "Rest": "Отдых"]
+        #expect(definition.renameSteps { names[$0] })
+        #expect(definition.prepare?.name == "Подготовка")
+        #expect(definition.blocks[0].steps.map(\.name) == ["Работа", "Burpees"])
+        #expect(definition.restBetweenSets?.name == "Отдых")
+        #expect(definition.cooldown?.name == "Cooldown")
+        #expect(!definition.renameSteps { names[$0] })
+    }
+}
