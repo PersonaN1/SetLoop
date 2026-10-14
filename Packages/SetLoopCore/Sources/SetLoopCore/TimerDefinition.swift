@@ -102,6 +102,8 @@ extension TimerDefinition {
         case tooManyStepsInBlock(blockIndex: Int)
         case stepDurationOutOfRange(stepID: UUID)
         case repeatsOutOfRange
+        /// Only the skipped last rest is left: there is nothing to run.
+        case emptyPlan
     }
 
     public func validate() throws(ValidationError) {
@@ -118,6 +120,7 @@ extension TimerDefinition {
         if let bad = allSteps.first(where: { !Limits.stepDuration.contains($0.duration) }) {
             throw .stepDurationOutOfRange(stepID: bad.id)
         }
+        guard stepCount > 0 else { throw .emptyPlan }
     }
 }
 

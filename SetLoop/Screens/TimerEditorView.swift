@@ -39,7 +39,16 @@ struct TimerEditorView: View {
         return result
     }
 
-    private var isValid: Bool { (try? cleaned.validate()) != nil }
+    private var validationError: TimerDefinition.ValidationError? {
+        do throws(TimerDefinition.ValidationError) {
+            try cleaned.validate()
+            return nil
+        } catch {
+            return error
+        }
+    }
+
+    private var isValid: Bool { validationError == nil }
 
     var body: some View {
         NavigationStack {
@@ -124,7 +133,14 @@ struct TimerEditorView: View {
         } header: {
             Text("Finish")
         } footer: {
-            Text("Removes only the rest at the very end of the workout. Rest between blocks and sets stays.")
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Removes only the rest at the very end of the workout. Rest between blocks and sets stays.")
+                // The reason Done is disabled, which is otherwise hard to guess.
+                if validationError == .emptyPlan {
+                    Text("Nothing to run: the only step is the last rest, which is skipped.")
+                        .foregroundStyle(.red)
+                }
+            }
         }
     }
 

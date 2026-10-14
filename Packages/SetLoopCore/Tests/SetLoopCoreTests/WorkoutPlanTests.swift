@@ -73,6 +73,12 @@ func step(_ duration: Int, _ type: StepType = .workA) -> Step {
         #expect(throws: TimerDefinition.ValidationError.tooManyBlocks) {
             try TimerDefinition(blocks: Array(repeating: Block(steps: [step(5)]), count: 11)).validate()
         }
+        #expect(throws: TimerDefinition.ValidationError.emptyPlan) {
+            try TimerDefinition(blocks: [Block(steps: [step(5, .rest)])], skipLastRest: true).validate()
+        }
+        // Prepare still gives the plan something to run.
+        #expect((try? TimerDefinition(prepare: step(5, .prepare), blocks: [Block(steps: [step(5, .rest)])],
+                                      skipLastRest: true).validate()) != nil)
     }
 
     @Test func definitionRoundTripsThroughJSON() throws {

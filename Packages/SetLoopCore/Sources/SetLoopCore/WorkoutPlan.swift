@@ -71,3 +71,24 @@ public struct WorkoutPlan: Hashable, Sendable {
 extension TimerDefinition {
     public var plan: WorkoutPlan { WorkoutPlan(self) }
 }
+
+// MARK: - Plan arithmetic
+
+extension TimerDefinition {
+    /// The plan drops the set's final step when it is a rest and `skipLastRest` is on.
+    var dropsLastRest: Bool {
+        skipLastRest && blocks.last(where: { !$0.steps.isEmpty })?.steps.last?.type == .rest
+    }
+
+    /// `plan.steps.count`, without building the plan.
+    public var stepCount: Int {
+        let setCount = max(sets, 1)
+        let perSet = blocks.reduce(0) { $0 + $1.steps.count * max($1.repeats, 1) }
+        var count = perSet * setCount
+        if perSet > 0, dropsLastRest { count -= 1 }
+        if restBetweenSets != nil { count += setCount - 1 }
+        if prepare != nil { count += 1 }
+        if cooldown != nil { count += 1 }
+        return count
+    }
+}
