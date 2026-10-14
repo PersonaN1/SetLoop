@@ -60,6 +60,7 @@ final class WorkoutController {
             case .skip: self?.skip()
             }
         }
+        WorkoutCommands.flush = { [weak self] in await self?.liveActivity.flush() }
         if settings.showOnLockScreen {
             liveActivity.start(timerName: name, state: activityState())
         }

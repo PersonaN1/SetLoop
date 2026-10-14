@@ -7,6 +7,8 @@ import SetLoopCore
 final class LiveActivityManager {
     /// Only the ID is kept: `Activity` is not Sendable, so each task looks it up off the main actor.
     private var activityID: String?
+    /// Updates are delivered one after another, so an older state never lands after a newer one.
+    private var lastTask: Task<Void, Never>?
 
     init() {
         // Activities outlive the app: a killed or reinstalled app leaves its last one on the lock screen.
@@ -25,14 +27,27 @@ final class LiveActivityManager {
 
     func update(_ state: WorkoutActivityAttributes.ContentState?) {
         guard let activityID, let state else { return }
-        Task.detached { await Self.activity(activityID)?.update(.init(state: state, staleDate: nil)) }
+        enqueue { await Self.activity(activityID)?.update(.init(state: state, staleDate: nil)) }
     }
 
     func end() {
         guard let activityID else { return }
         self.activityID = nil
         // Removed at once: a finished workout has nothing left to show (SPEC D7).
-        Task.detached { await Self.activity(activityID)?.end(nil, dismissalPolicy: .immediate) }
+        enqueue { await Self.activity(activityID)?.end(nil, dismissalPolicy: .immediate) }
+    }
+
+    /// Waits until every update and end requested so far is delivered.
+    func flush() async {
+        await lastTask?.value
+    }
+
+    private func enqueue(_ work: @escaping @Sendable () async -> Void) {
+        let previous = lastTask
+        lastTask = Task.detached {
+            await previous?.value
+            await work()
+        }
     }
 
     /// Ends the activities that exist right now. The IDs are taken synchronously, so an activity
