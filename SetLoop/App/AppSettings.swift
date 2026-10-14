@@ -28,6 +28,8 @@ final class AppSettings {
     var vibration: Bool { didSet { defaults.set(vibration, forKey: Key.vibration) } }
     var voicePrompts: Bool { didSet { defaults.set(voicePrompts, forKey: Key.voicePrompts) } }
     var ignoreSilentMode: Bool { didSet { defaults.set(ignoreSilentMode, forKey: Key.ignoreSilentMode) } }
+    /// `nil` is "Off".
+    var soundSet: SoundSet? { didSet { defaults.set(soundSet?.rawValue ?? Self.off, forKey: Key.soundSet) } }
 
     // Appearance
     var theme: Theme { didSet { defaults.set(theme.rawValue, forKey: Key.theme) } }
@@ -47,6 +49,7 @@ final class AppSettings {
             Key.vibration: true,
             Key.voicePrompts: false,
             Key.ignoreSilentMode: true,
+            Key.soundSet: SoundSet.classic.rawValue,
         ])
         pauseOnInterruption = defaults.bool(forKey: Key.pauseOnInterruption)
         showOnLockScreen = defaults.bool(forKey: Key.showOnLockScreen)
@@ -54,10 +57,13 @@ final class AppSettings {
         vibration = defaults.bool(forKey: Key.vibration)
         voicePrompts = defaults.bool(forKey: Key.voicePrompts)
         ignoreSilentMode = defaults.bool(forKey: Key.ignoreSilentMode)
+        soundSet = defaults.string(forKey: Key.soundSet).flatMap(SoundSet.init)
         theme = defaults.string(forKey: Key.theme).flatMap(Theme.init) ?? .system
         stepColors = defaults.data(forKey: Key.stepColors)
             .flatMap { try? JSONDecoder().decode(StepColors.self, from: $0) } ?? .default
     }
+
+    private static let off = "off"
 
     private enum Key {
         static let pauseOnInterruption = "pauseOnInterruption"
@@ -66,6 +72,7 @@ final class AppSettings {
         static let vibration = "vibration"
         static let voicePrompts = "voicePrompts"
         static let ignoreSilentMode = "ignoreSilentMode"
+        static let soundSet = "soundSet"
         static let theme = "theme"
         static let stepColors = "stepColors"
     }
