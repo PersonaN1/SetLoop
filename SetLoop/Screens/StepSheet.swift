@@ -68,7 +68,10 @@ struct StepSheet: View {
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { finish() }.fontWeight(.semibold)
+                    Button("Done") { finish() }
+                        .fontWeight(.semibold)
+                        // The wheels pass through 0:00; a step can't be that short.
+                        .disabled(!Limits.stepDuration.contains(step.duration))
                 }
             }
         }
@@ -91,7 +94,8 @@ struct StepSheet: View {
     }
 }
 
-/// Minutes and seconds wheels, 0:01–99:59.
+/// Minutes and seconds wheels, 0:00–99:59. 0:00 is kept, not clamped, so turning a wheel
+/// back returns to the same time; the sheet disables Done instead.
 struct DurationPicker: View {
     @Binding var seconds: Int
 
@@ -124,7 +128,7 @@ struct DurationPicker: View {
                 var parts = Parts(minutes: seconds / 60, seconds: seconds % 60)
                 parts[keyPath: keyPath] = newValue
                 let total = parts.minutes * 60 + parts.seconds
-                seconds = min(max(total, Limits.stepDuration.lowerBound), Limits.stepDuration.upperBound)
+                seconds = min(max(total, 0), Limits.stepDuration.upperBound)
             }
         )
     }
