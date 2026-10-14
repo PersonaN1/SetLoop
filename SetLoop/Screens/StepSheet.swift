@@ -28,6 +28,7 @@ struct StepSheet: View {
             Form {
                 Section {
                     TextField("Name", text: $step.name)
+                        .submitLabel(.done)
                 }
                 if !editing.slot.fixedType {
                     Section("Type") {
@@ -50,6 +51,7 @@ struct StepSheet: View {
                     DurationPicker(seconds: $step.duration)
                 }
             }
+            .scrollDismissesKeyboard(.immediately)
             .navigationTitle("Step")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

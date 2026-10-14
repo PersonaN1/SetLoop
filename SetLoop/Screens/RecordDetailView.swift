@@ -35,6 +35,7 @@ struct RecordDetailView: View {
 
             Section {
                 TextField("Name", text: $record.name)
+                    .submitLabel(.done)
                 TextField("Note", text: $record.note, axis: .vertical)
             }
 
@@ -50,6 +51,7 @@ struct RecordDetailView: View {
                 Button("Delete Workout", systemImage: "trash", role: .destructive) { confirmingDelete = true }
             }
         }
+        .scrollDismissesKeyboard(.immediately)
         .navigationTitle(record.name)
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog("Delete this workout?", isPresented: $confirmingDelete, titleVisibility: .visible) {

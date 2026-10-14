@@ -28,7 +28,7 @@ struct SummaryView: View {
                 .frame(maxWidth: 600)
                 .frame(maxWidth: .infinity)
             }
-            .scrollDismissesKeyboard(.interactively)
+            .scrollDismissesKeyboard(.immediately)
             .safeAreaInset(edge: .bottom) { buttons }
             .navigationTitle("Summary")
             .navigationBarTitleDisplayMode(.inline)
@@ -64,6 +64,7 @@ struct SummaryView: View {
     private var fields: some View {
         VStack(spacing: 12) {
             TextField("Name", text: $name)
+                .submitLabel(.done)
             TextField("Note (optional)", text: $note, axis: .vertical)
                 .lineLimit(2...5)
         }

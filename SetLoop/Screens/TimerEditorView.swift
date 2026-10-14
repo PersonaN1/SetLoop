@@ -14,6 +14,7 @@ struct TimerEditorView: View {
     private let original: TimerDefinition
 
     @State private var name: String
+    @FocusState private var nameFocused: Bool
     @State private var draft: TimerDefinition
     @State private var editing: StepEditing?
     @State private var editMode = EditMode.inactive
@@ -46,6 +47,9 @@ struct TimerEditorView: View {
                 Section {
                     // An empty name falls back to the numbered default shown as the prompt.
                     TextField("Name", text: $name, prompt: Text("New Timer"))
+                        // Return reads "Done" and closes the keyboard.
+                        .submitLabel(.done)
+                        .focused($nameFocused)
                 }
                 general
                 ForEach(draft.blocks) { block in
@@ -62,7 +66,11 @@ struct TimerEditorView: View {
                 finish
             }
             .environment(\.editMode, $editMode)
-            .safeAreaInset(edge: .bottom) { bottomPanel }
+            .safeAreaInset(edge: .bottom) {
+                // Over the keyboard the panel would cover half the screen.
+                if !nameFocused { bottomPanel }
+            }
+            .scrollDismissesKeyboard(.immediately)
             .navigationTitle(timer == nil ? "New Timer" : "Edit Timer")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
