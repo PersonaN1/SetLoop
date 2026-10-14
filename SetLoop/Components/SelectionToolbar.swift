@@ -14,17 +14,24 @@ struct SelectionToolbar: ViewModifier {
     func body(content: Content) -> some View {
         content
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(editMode.isEditing ? "Done" : "Select") { setEditing(!editMode.isEditing) }
-                        .disabled(allIDs.isEmpty && !editMode.isEditing)
-                }
+                // Select All takes the place of Select, next to Done, instead of jumping to the left.
                 if editMode.isEditing {
-                    ToolbarItem(placement: .topBarLeading) {
+                    ToolbarItem(placement: .topBarTrailing) {
                         let allSelected = !allIDs.isEmpty && selection.count == allIDs.count
                         Button(allSelected ? "Deselect All" : "Select All") {
                             selection = allSelected ? [] : Set(allIDs)
                         }
                     }
+                    // iOS 26 would merge both into one glass capsule.
+                    if #available(iOS 26, *) {
+                        ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(editMode.isEditing ? "Done" : "Select") { setEditing(!editMode.isEditing) }
+                        .disabled(allIDs.isEmpty && !editMode.isEditing)
+                }
+                if editMode.isEditing {
                     ToolbarItem(placement: .bottomBar) {
                         Button(role: .destructive) {
                             confirmingSelection = true

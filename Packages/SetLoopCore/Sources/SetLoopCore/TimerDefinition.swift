@@ -120,3 +120,23 @@ extension TimerDefinition {
         }
     }
 }
+
+extension TimerDefinition {
+    /// Renames the steps for which `rename` returns a new name. Returns whether anything changed.
+    @discardableResult
+    public mutating func renameSteps(_ rename: (String) -> String?) -> Bool {
+        var changed = false
+        func apply(_ step: inout Step) {
+            guard let name = rename(step.name), name != step.name else { return }
+            step.name = name
+            changed = true
+        }
+        if prepare != nil { apply(&prepare!) }
+        for b in blocks.indices {
+            for s in blocks[b].steps.indices { apply(&blocks[b].steps[s]) }
+        }
+        if restBetweenSets != nil { apply(&restBetweenSets!) }
+        if cooldown != nil { apply(&cooldown!) }
+        return changed
+    }
+}
