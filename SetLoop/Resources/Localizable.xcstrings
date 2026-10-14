@@ -1,5 +1,50 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {},
-  "version" : "1.0"
+  "sourceLanguage": "en",
+  "strings": {
+    "Delete %lld timers?": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Delete %lld timer?"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Delete %lld timers?"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Delete %lld workouts?": {
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Delete %lld workout?"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "Delete %lld workouts?"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
 }

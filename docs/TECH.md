@@ -42,7 +42,7 @@
 - `SavedTimer` (SwiftData): поля для списка — `id`, `name`, `sortIndex`, `createdAt`, `updatedAt`, `totalDuration` (кеш) + `definitionData: Data` — JSON `TimerDefinition` из `SetLoopCore`.
 - `TimerDefinition` (Codable, value type): `version`, подготовка, сеты, отдых между сетами, блоки → шаги, заминка, «Пропускать последний отдых». Порядок — порядок массивов.
 - Редактор работает с копией `TimerDefinition`; запись в базу только по «Готово», «Отмена» ничего не трогает.
-- `WorkoutRecord` (SwiftData): `id`, `startedAt`, `name`, `note`, `duration`, `status` (полностью/частично), `workTime`, `restTime`, `otherTime`, `completedSteps`, `totalSteps` + `stepsData: Data` — снимок пройденных шагов с отметками выполнено/пропущено. Независим от таймера: правка или удаление таймера историю не меняют.
+- `WorkoutRecord` (SwiftData): `id`, `startedAt`, `name`, `note`, `duration`, `status` (полностью/частично), `workTime`, `restTime`, `otherTime`, `completedSteps`, `totalSteps` + `stepsData: Data` — снимок пройденных шагов с отметками выполнено/пропущено. Плюс `definitionData: Data` — снимок `TimerDefinition` для «Повторить». Независим от таймера: правка или удаление таймера историю не меняют.
 - CloudKit (v1.1): таймер синхронизируется целиком, конфликт — побеждает последняя правка; запись не «рвётся».
 - Миграции формата — по полю `version` при декодировании.
 

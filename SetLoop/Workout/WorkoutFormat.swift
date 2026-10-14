@@ -8,6 +8,20 @@ enum WorkoutFormat {
         return String(format: "%d:%02d", total / 60, total % 60)
     }
 
+    /// Workout length: 4:52, 1:05:30.
+    static func duration(_ seconds: Int) -> String {
+        seconds >= 3600
+            ? String(format: "%d:%02d:%02d", seconds / 3600, seconds / 60 % 60, seconds % 60)
+            : String(format: "%d:%02d", seconds / 60, seconds % 60)
+    }
+
+    /// Totals in words: "1 hr, 20 min", "45 min".
+    static func longDuration(_ seconds: Int) -> String {
+        // Under a minute shows seconds, so a short workout never reads as "0 min".
+        let units: Set<Duration.UnitsFormatStyle.Unit> = seconds < 60 ? [.seconds] : [.hours, .minutes]
+        return Duration.seconds(seconds).formatted(.units(allowed: units, width: .abbreviated))
+    }
+
     /// "Cycle 2/3 · Set 1/4"; parts that don't apply are omitted.
     static func position(_ position: PlannedStep.Position) -> String {
         var parts: [String] = []
