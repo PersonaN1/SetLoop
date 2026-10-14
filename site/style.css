@@ -57,3 +57,32 @@ a { color: var(--accent); }
 footer { margin-top: 48px; font-size: 14px; color: var(--muted); }
 /* Both languages are on every page; lang.js hides the other one. Without JS both stay visible. */
 html.js [data-lang]:not(.shown) { display: none; }
+
+/* Step colors from StepColors.default. */
+:root { --work: #e8452c; --work-b: #9c2bb0; --rest: #1e8e52; --other: #5b6470; }
+.lead { font-size: 19px; }
+.badge {
+  display: inline-block; margin-top: 8px; background: var(--fg); color: var(--bg);
+  border-radius: 10px; padding: 8px 14px; font-size: 14px; font-weight: 600;
+}
+.shots {
+  display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory;
+  margin: 24px -16px; padding: 0 16px 8px; scrollbar-width: thin;
+}
+.shots figure { flex: 0 0 200px; margin: 0; scroll-snap-align: start; }
+.shots img {
+  display: block; width: 100%; height: auto; aspect-ratio: 1179 / 2556;
+  border-radius: 26px; box-shadow: 0 2px 10px rgba(0, 0, 0, .15);
+}
+.shots figcaption { font-size: 14px; color: var(--muted); margin-top: 8px; text-align: center; }
+@media (min-width: 860px) {
+  .shots { overflow: visible; margin: 24px 0; padding: 0; }
+  .shots figure { flex: 1 1 0; }
+}
+.how .level + .level { margin-top: 20px; }
+.how h3 { font-size: 17px; margin: 0 0 2px; }
+.how p { color: var(--muted); font-size: 15px; margin: 0 0 8px; }
+.how .repeat { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+.strip { display: flex; gap: 2px; height: 12px; border-radius: 6px; overflow: hidden; }
+.strip i { display: block; min-width: 2px; border-radius: 2px; }
+.telegram .button { margin-top: 4px; }

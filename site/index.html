@@ -6,10 +6,10 @@
 <title>SetLoop — Interval Timer</title>
 <meta name="title-en" content="SetLoop — Interval Timer">
 <meta name="title-ru" content="SetLoop — интервальный таймер">
-<meta name="description" content="SetLoop is an interval timer for iPhone: work, rest, sets and blocks, with sounds, voice and a Live Activity.">
+<meta name="description" content="SetLoop is an interval timer for iPhone: blocks, sets, any combination, with sounds, voice and a Live Activity.">
 <link rel="icon" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=2">
 <script src="lang.js"></script>
 </head>
 <body>
@@ -29,8 +29,25 @@
     <div class="hero">
       <h1>SetLoop</h1>
       <p class="muted">Interval timer for iPhone</p>
+      <span class="badge">Coming soon to the App Store</span>
     </div>
-    <p>A timer for any workout: blocks, sets, any combination. The whole structure is visible at a glance.</p>
+    <p class="lead">A timer for any workout: blocks, sets, any combination. The whole structure is visible at a glance.</p>
+
+    <div class="shots" aria-label="Screenshots">
+      <figure><img src="screens/en-1-list.jpg" alt="Timer list with colored strips" loading="lazy"><figcaption>Every timer as a colored strip</figcaption></figure>
+      <figure><img src="screens/en-2-preview.jpg" alt="Timer overview: total time, work and rest, structure" loading="lazy"><figcaption>Structure and totals before you start</figcaption></figure>
+      <figure><img src="screens/en-3-workout.jpg" alt="Workout screen with a large countdown" loading="lazy"><figcaption>Large countdown, readable from afar</figcaption></figure>
+      <figure><img src="screens/en-4-lock.jpg" alt="Live Activity on the Lock Screen" loading="lazy"><figcaption>On the Lock Screen, with pause and skip</figcaption></figure>
+    </div>
+
+    <h2>How it works</h2>
+    <div class="card how">
+        <div class="level"><h3>Step</h3><p>A stretch of time: work, rest, prepare or cooldown. Each type has its own color.</p><div class="strip"><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i></div></div>
+        <div class="level"><h3>Block</h3><p>A few steps repeated as many times as you need. For example, 20 seconds of work and 10 of rest ×4.</p><div class="repeat">×4</div><div class="strip"><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i></div></div>
+        <div class="level"><h3>Set</h3><p>All blocks in order. There can be several blocks, each with its own repeats.</p><div class="strip"><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i></div></div>
+        <div class="level"><h3>Workout</h3><p>Sets repeat with rest between them. Optional prepare at the start and cooldown at the end.</p><div class="strip"><i style="flex:10;background:var(--other)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:60;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:60;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:60;background:var(--other)"></i></div></div>
+    </div>
+
     <div class="card">
       <h2>What it can do</h2>
       <ul>
@@ -53,6 +70,13 @@
         <li>Russian and English.</li>
       </ul>
     </div>
+
+    <div class="card telegram">
+      <h2>News and contact</h2>
+      <p>Updates, plans and answers to questions — in the Telegram channel. You can message us there directly.</p>
+      <a class="button" href="https://t.me/setnewloop">Open @setnewloop</a>
+    </div>
+
     <p>Free, no ads, no accounts, no data collection.</p>
     <div class="links">
       <a href="support/">Support<span>Questions, problems and ideas</span></a>
@@ -64,13 +88,30 @@
     <div class="hero">
       <h1>SetLoop</h1>
       <p class="muted">Интервальный таймер для iPhone</p>
+      <span class="badge">Скоро в App Store</span>
     </div>
-    <p>Таймер для тренировки любой сложности: блоки, подходы, любые сочетания. Вся структура видна с первого взгляда.</p>
+    <p class="lead">Таймер для тренировки любой сложности: блоки, сеты, любые сочетания. Вся структура видна с первого взгляда.</p>
+
+    <div class="shots" aria-label="Скриншоты">
+      <figure><img src="screens/ru-1-list.jpg" alt="Список таймеров с цветными полосами" loading="lazy"><figcaption>Каждый таймер — цветная полоса</figcaption></figure>
+      <figure><img src="screens/ru-2-preview.jpg" alt="Обзор таймера: общее время, работа и отдых, структура" loading="lazy"><figcaption>Структура и итоги до старта</figcaption></figure>
+      <figure><img src="screens/ru-3-workout.jpg" alt="Экран тренировки с крупным отсчётом" loading="lazy"><figcaption>Крупный отсчёт, видно издалека</figcaption></figure>
+      <figure><img src="screens/ru-4-lock.jpg" alt="Live Activity на экране блокировки" loading="lazy"><figcaption>На экране блокировки, с паузой и пропуском</figcaption></figure>
+    </div>
+
+    <h2>Как это устроено</h2>
+    <div class="card how">
+        <div class="level"><h3>Шаг</h3><p>Отрезок времени: работа, отдых, подготовка или заминка. У каждого типа свой цвет.</p><div class="strip"><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i></div></div>
+        <div class="level"><h3>Блок</h3><p>Несколько шагов, повторённых нужное число раз. Например, 20 секунд работы и 10 отдыха ×4.</p><div class="repeat">×4</div><div class="strip"><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i></div></div>
+        <div class="level"><h3>Сет</h3><p>Все блоки по порядку. Блоков может быть несколько, у каждого свои повторы.</p><div class="strip"><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i></div></div>
+        <div class="level"><h3>Тренировка</h3><p>Сеты повторяются с отдыхом между ними. В начале — подготовка, в конце — заминка, если нужны.</p><div class="strip"><i style="flex:10;background:var(--other)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:60;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:60;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:20;background:var(--work)"></i><i style="flex:10;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:30;background:var(--work-b)"></i><i style="flex:15;background:var(--rest)"></i><i style="flex:60;background:var(--other)"></i></div></div>
+    </div>
+
     <div class="card">
       <h2>Возможности</h2>
       <ul>
         <li>Шаги разных типов — подготовка, три вида работы, отдых, заминка — у каждого свой цвет.</li>
-        <li>Блоки со своими повторами, подходы с отдыхом между ними.</li>
+        <li>Блоки со своими повторами, сеты с отдыхом между ними.</li>
         <li>Готовые таймеры для старта, например табата.</li>
         <li>Звуки, голосовые подсказки и вибрация перед каждым шагом.</li>
         <li>Таймер на экране блокировки и в Dynamic Island с кнопками паузы и пропуска.</li>
@@ -88,6 +129,13 @@
         <li>Русский и английский язык.</li>
       </ul>
     </div>
+
+    <div class="card telegram">
+      <h2>Новости и связь</h2>
+      <p>Обновления, планы и ответы на вопросы — в Telegram-канале. Там же можно написать нам напрямую.</p>
+      <a class="button" href="https://t.me/setnewloop">Открыть @setnewloop</a>
+    </div>
+
     <p>Бесплатно, без рекламы, без аккаунтов и без сбора данных.</p>
     <div class="links">
       <a href="support/">Поддержка<span>Вопросы, проблемы и идеи</span></a>
