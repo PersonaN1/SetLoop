@@ -72,7 +72,6 @@ private func step(_ name: String, _ type: StepType = .workA, _ duration: Int = 1
         let strip = PreviewStrip(TimerDefinition(blocks: [Block(steps: [work, rest], repeats: 20), Block(steps: [rest], repeats: 3)]))
         #expect(strip.level == .oneCycle)
         #expect(strip.groups.map(\.repeats) == [20, 3])
-        #expect(strip.equalGroupWidths)
     }
 
     @Test func hugeBlocksCollapse() {

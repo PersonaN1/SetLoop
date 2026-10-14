@@ -22,8 +22,6 @@ public struct PreviewStrip: Equatable, Sendable {
 
     public var level: Level
     public var groups: [Group]
-    /// Groups share the width equally on levels 3–4; otherwise widths follow durations.
-    public var equalGroupWidths: Bool { level == .oneCycle || level == .blocks }
 
     public init(_ definition: TimerDefinition, threshold: Int = Self.threshold) {
         let sets = max(definition.sets, 1)
