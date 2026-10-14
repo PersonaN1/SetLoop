@@ -157,6 +157,8 @@ struct TimerEditorView: View {
                 } label: {
                     Image(systemName: "ellipsis.circle").imageScale(.large)
                 }
+                // The header uppercases its text, menu items included.
+                .textCase(nil)
                 .accessibilityLabel("Block \(index + 1) Options")
             }
         } footer: {
@@ -312,6 +314,7 @@ struct TimerEditorView: View {
             let sortIndex = ((try? context.fetch(last))?.first?.sortIndex ?? -1) + 1
             context.insert(SavedTimer(name: finalName, definition: cleaned, sortIndex: sortIndex))
         }
+        try? context.save()
         dismiss()
     }
 

@@ -55,6 +55,7 @@ struct RecordDetailView: View {
         .confirmationDialog("Delete this workout?", isPresented: $confirmingDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive) {
                 context.delete(record)
+                try? context.save()
                 dismiss()
             }
         }

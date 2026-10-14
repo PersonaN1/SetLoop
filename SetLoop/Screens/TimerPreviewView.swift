@@ -75,6 +75,7 @@ struct TimerPreviewView: View {
         .confirmationDialog("Delete this timer?", isPresented: $confirmingDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive) {
                 context.delete(timer)
+                try? context.save()
                 dismiss()
             }
         } message: {
@@ -130,6 +131,7 @@ extension ModelContext {
         insert(SavedTimer(name: String(localized: "\(timer.name) Copy"),
                           definition: timer.definition,
                           sortIndex: timer.sortIndex + 1))
+        try? save()
         return true
     }
 }

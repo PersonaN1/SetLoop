@@ -119,6 +119,7 @@ struct TimerListView: View {
         for (index, timer) in ordered.enumerated() where timer.sortIndex != index {
             timer.sortIndex = index
         }
+        try? context.save()
     }
 }
 
