@@ -22,6 +22,10 @@ struct SelectionToolbar: ViewModifier {
                             selection = allSelected ? [] : Set(allIDs)
                         }
                     }
+                    // iOS 26 would merge both into one glass capsule.
+                    if #available(iOS 26, *) {
+                        ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                    }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(editMode.isEditing ? "Done" : "Select") { setEditing(!editMode.isEditing) }
