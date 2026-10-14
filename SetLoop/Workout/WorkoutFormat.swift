@@ -17,7 +17,9 @@ enum WorkoutFormat {
 
     /// Totals in words: "1 hr, 20 min", "45 min".
     static func longDuration(_ seconds: Int) -> String {
-        Duration.seconds(seconds).formatted(.units(allowed: [.hours, .minutes], width: .abbreviated))
+        // Under a minute shows seconds, so a short workout never reads as "0 min".
+        let units: Set<Duration.UnitsFormatStyle.Unit> = seconds < 60 ? [.seconds] : [.hours, .minutes]
+        return Duration.seconds(seconds).formatted(.units(allowed: units, width: .abbreviated))
     }
 
     /// "Cycle 2/3 · Set 1/4"; parts that don't apply are omitted.
