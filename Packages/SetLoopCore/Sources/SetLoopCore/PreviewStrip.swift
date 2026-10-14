@@ -26,18 +26,20 @@ public struct PreviewStrip: Equatable, Sendable {
     public var equalGroupWidths: Bool { level == .oneCycle || level == .blocks }
 
     public init(_ definition: TimerDefinition, threshold: Int = Self.threshold) {
-        let plan = definition.plan
         let sets = max(definition.sets, 1)
-        let oneSet = definition.blocks.flatMap { block in
-            Array(repeating: block.steps, count: max(block.repeats, 1)).flatMap { $0 }
-        }
+        let oneSetCount = definition.blocks.reduce(0) { $0 + $1.steps.count * max($1.repeats, 1) }
         let cycleSteps = definition.blocks.reduce(0) { $0 + $1.steps.count }
 
-        if plan.steps.count <= threshold {
+        // The plan and the set are built only when they are short enough to be drawn.
+        if definition.stepCount <= threshold {
             level = .workout
-            groups = [Group(segments: plan.steps.map { Segment(type: $0.type, duration: $0.duration) }, repeats: 1)]
-        } else if sets > 1, oneSet.count <= threshold {
+            groups = [Group(segments: definition.plan.steps.map { Segment(type: $0.type, duration: $0.duration) },
+                            repeats: 1)]
+        } else if sets > 1, oneSetCount <= threshold {
             level = .oneSet
+            let oneSet = definition.blocks.flatMap { block in
+                Array(repeating: block.steps, count: max(block.repeats, 1)).flatMap { $0 }
+            }
             groups = [Group(segments: oneSet.map(Segment.init), repeats: sets)]
         } else if cycleSteps <= threshold {
             level = .oneCycle

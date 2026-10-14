@@ -30,7 +30,7 @@ extension TimerDefinition {
     func structureText(includingSteps: Bool = false) -> String {
         var parts = [String(localized: "\(blocks.count) blocks")]
         if sets > 1 { parts.append(String(localized: "\(sets) sets")) }
-        if includingSteps { parts.append(String(localized: "\(plan.steps.count) steps")) }
+        if includingSteps { parts.append(String(localized: "\(stepCount) steps")) }
         return parts.joined(separator: " · ")
     }
 }

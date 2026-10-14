@@ -103,3 +103,47 @@ func step(_ duration: Int, _ type: StepType = .workA) -> Step {
         #expect(colors.isAllowed(RGB(0x1E8E52), for: .prepare))
     }
 }
+
+@Suite struct PlanArithmeticTests {
+    private func expectMatchesPlan(_ definition: TimerDefinition, sourceLocation: SourceLocation = #_sourceLocation) {
+        let plan = definition.plan
+        #expect(definition.stepCount == plan.steps.count, sourceLocation: sourceLocation)
+        #expect(definition.totalDuration == plan.totalDuration, sourceLocation: sourceLocation)
+        for category in [StepType.Category.work, .rest, .other] {
+            #expect(definition.duration(of: category) == plan.duration(of: category), sourceLocation: sourceLocation)
+        }
+    }
+
+    @Test func presetsMatchPlan() {
+        for preset in Presets.all(names) {
+            expectMatchesPlan(preset.definition)
+            var skipping = preset.definition
+            skipping.skipLastRest.toggle()
+            expectMatchesPlan(skipping)
+        }
+    }
+
+    @Test func edgeCasesMatchPlan() {
+        let rest = step(7, .rest)
+        let cases = [
+            TimerDefinition(blocks: []),
+            TimerDefinition(blocks: [Block(steps: [])]),
+            TimerDefinition(blocks: [Block(steps: [rest])], skipLastRest: true),
+            TimerDefinition(prepare: step(5, .prepare), blocks: [Block(steps: [rest])], skipLastRest: true),
+            TimerDefinition(blocks: [Block(steps: [step(20), rest], repeats: 4)], sets: 3,
+                            restBetweenSets: step(60, .rest), cooldown: step(30, .cooldown), skipLastRest: true),
+            // The last non-empty block decides; an empty block after it doesn't.
+            TimerDefinition(blocks: [Block(steps: [step(20), rest], repeats: 2), Block(steps: [])], sets: 2,
+                            skipLastRest: true),
+            TimerDefinition(blocks: [Block(steps: [rest, step(20)])], sets: 2, restBetweenSets: step(60, .rest),
+                            skipLastRest: true),
+            TimerDefinition(blocks: [], sets: 3, restBetweenSets: step(60, .rest), skipLastRest: true),
+            TimerDefinition(blocks: [Block(steps: [step(20, .workB), step(15, .workC)], repeats: 99)], sets: 99),
+        ]
+        for definition in cases { expectMatchesPlan(definition) }
+    }
+
+    @Test func emptyPlanIsCounted() {
+        #expect(TimerDefinition(blocks: [Block(steps: [step(5, .rest)])], skipLastRest: true).stepCount == 0)
+    }
+}

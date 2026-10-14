@@ -229,7 +229,7 @@ struct TimerEditorView: View {
             HStack {
                 Text("Total").foregroundStyle(.secondary)
                 Spacer()
-                Text(WorkoutFormat.duration(cleaned.plan.totalDuration)).fontWeight(.semibold).monospacedDigit()
+                Text(WorkoutFormat.duration(cleaned.totalDuration)).fontWeight(.semibold).monospacedDigit()
             }
             .font(.subheadline)
             TimerStrip(definition: cleaned, colors: workout.colors, height: 8)

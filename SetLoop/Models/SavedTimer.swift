@@ -24,7 +24,7 @@ final class SavedTimer {
         get { (try? JSONDecoder().decode(TimerDefinition.self, from: definitionData)) ?? TimerDefinition(blocks: []) }
         set {
             definitionData = (try? JSONEncoder().encode(newValue)) ?? Data()
-            totalDuration = newValue.plan.totalDuration
+            totalDuration = newValue.totalDuration
             updatedAt = .now
         }
     }

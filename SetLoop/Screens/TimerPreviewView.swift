@@ -23,22 +23,21 @@ struct TimerPreviewView: View {
     }
 
     private func content(_ definition: TimerDefinition) -> some View {
-        let plan = definition.plan
-        return List {
+        List {
             Section {
                 VStack(alignment: .leading, spacing: 14) {
                     Text(definition.structureText(includingSteps: true))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                    Text(WorkoutFormat.duration(plan.totalDuration))
+                    Text(WorkoutFormat.duration(definition.totalDuration))
                         .font(.system(.largeTitle, design: .rounded, weight: .bold))
                         .monospacedDigit()
-                        .accessibilityLabel(WorkoutFormat.longDuration(plan.totalDuration))
+                        .accessibilityLabel(WorkoutFormat.longDuration(definition.totalDuration))
                     TimerStrip(definition: definition, colors: workout.colors, height: 12)
                     HStack {
-                        Metric(title: "Work", value: WorkoutFormat.duration(plan.duration(of: .work)))
-                        Metric(title: "Rest", value: WorkoutFormat.duration(plan.duration(of: .rest)))
-                        Metric(title: "Other", value: WorkoutFormat.duration(plan.duration(of: .other)))
+                        Metric(title: "Work", value: WorkoutFormat.duration(definition.duration(of: .work)))
+                        Metric(title: "Rest", value: WorkoutFormat.duration(definition.duration(of: .rest)))
+                        Metric(title: "Other", value: WorkoutFormat.duration(definition.duration(of: .other)))
                     }
                 }
                 .padding(.vertical, 6)
