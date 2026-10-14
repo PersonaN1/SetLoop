@@ -30,7 +30,7 @@ extension TimerDefinition {
     func structureText(includingSteps: Bool = false) -> String {
         var parts = [String(localized: "\(blocks.count) blocks")]
         if sets > 1 { parts.append(String(localized: "\(sets) sets")) }
-        if includingSteps { parts.append(String(localized: "\(plan.steps.count) steps")) }
+        if includingSteps { parts.append(String(localized: "\(stepCount) steps")) }
         return parts.joined(separator: " · ")
     }
 }
@@ -84,5 +84,15 @@ struct TimerStrip: View {
         }
         .frame(height: height)
         .clipShape(Capsule())
+    }
+}
+
+extension View {
+    /// Cuts a name typed or pasted into a text field to `Limits.maxNameLength`.
+    func nameLimit(_ text: Binding<String>) -> some View {
+        onChange(of: text.wrappedValue) { _, newValue in
+            let capped = newValue.cappedName
+            if capped != newValue { text.wrappedValue = capped }
+        }
     }
 }

@@ -93,6 +93,15 @@ public enum Limits {
     public static let maxStepsPerBlock = 30
     public static let stepDuration = 1...5999
     public static let repeats = 1...99
+    /// Timer, step and history names. Keeps the Live Activity state well under its 4 KB limit.
+    public static let maxNameLength = 60
+}
+
+extension String {
+    /// The name cut to `Limits.maxNameLength` characters.
+    public var cappedName: String {
+        count > Limits.maxNameLength ? String(prefix(Limits.maxNameLength)) : self
+    }
 }
 
 extension TimerDefinition {
@@ -102,6 +111,8 @@ extension TimerDefinition {
         case tooManyStepsInBlock(blockIndex: Int)
         case stepDurationOutOfRange(stepID: UUID)
         case repeatsOutOfRange
+        /// Only the skipped last rest is left: there is nothing to run.
+        case emptyPlan
     }
 
     public func validate() throws(ValidationError) {
@@ -118,6 +129,7 @@ extension TimerDefinition {
         if let bad = allSteps.first(where: { !Limits.stepDuration.contains($0.duration) }) {
             throw .stepDurationOutOfRange(stepID: bad.id)
         }
+        guard stepCount > 0 else { throw .emptyPlan }
     }
 }
 

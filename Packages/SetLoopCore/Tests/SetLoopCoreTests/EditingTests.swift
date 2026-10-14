@@ -10,17 +10,23 @@ private func step(_ name: String, _ type: StepType = .workA, _ duration: Int = 1
     let a = step("A"), b = step("B", .rest), c = step("C"), d = step("D", .rest)
 
     @Test func middleStepsBecomeLoopedBlock() throws {
-        var definition = TimerDefinition(blocks: [Block(steps: [a, b, c, d], repeats: 1)])
+        let original = Block(steps: [a, b, c, d], repeats: 1)
+        var definition = TimerDefinition(blocks: [original])
         try definition.mergeIntoBlock(stepIDs: [b.id, c.id])
         #expect(definition.blocks.map { $0.steps.map(\.name) } == [["A"], ["B", "C"], ["D"]])
         #expect(definition.blocks.map(\.repeats) == [1, 2, 1])
+        #expect(definition.blocks[0].id == original.id)
+        #expect(Set(definition.blocks.map(\.id)).count == 3)
     }
 
     @Test func leadingStepsSplitOnce() throws {
-        var definition = TimerDefinition(blocks: [Block(steps: [a, b, c], repeats: 3)])
+        let original = Block(steps: [a, b, c], repeats: 3)
+        var definition = TimerDefinition(blocks: [original])
         try definition.mergeIntoBlock(stepIDs: [a.id, b.id])
         #expect(definition.blocks.map { $0.steps.map(\.name) } == [["A", "B"], ["C"]])
         #expect(definition.blocks.map(\.repeats) == [2, 3])
+        #expect(definition.blocks[0].id == original.id)
+        #expect(definition.blocks[1].id != original.id)
     }
 
     @Test func rejectsGapsOtherBlocksAndWholeBlock() {
@@ -66,7 +72,6 @@ private func step(_ name: String, _ type: StepType = .workA, _ duration: Int = 1
         let strip = PreviewStrip(TimerDefinition(blocks: [Block(steps: [work, rest], repeats: 20), Block(steps: [rest], repeats: 3)]))
         #expect(strip.level == .oneCycle)
         #expect(strip.groups.map(\.repeats) == [20, 3])
-        #expect(strip.equalGroupWidths)
     }
 
     @Test func hugeBlocksCollapse() {

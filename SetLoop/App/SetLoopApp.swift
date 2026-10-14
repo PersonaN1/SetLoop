@@ -20,13 +20,22 @@ struct SetLoopApp: App {
                 .environment(workout)
                 .preferredColorScheme(settings.theme.colorScheme)
         }
-        .modelContainer(for: [SavedTimer.self, WorkoutRecord.self]) { result in
-            if case .success(let container) = result {
-                PresetSeeder.seedIfNeeded(container.mainContext)
-                DefaultNames.relocalize(container.mainContext)
-            }
-        }
+        .modelContainer(Self.container)
     }
+
+    /// Created once: SwiftUI may build the App more than once.
+    private static let container: ModelContainer = {
+        let container: ModelContainer
+        do {
+            container = try ModelContainer(for: Schema(versionedSchema: SchemaV1.self),
+                                           migrationPlan: SetLoopMigrationPlan.self)
+        } catch {
+            fatalError("Can't open the store: \(error)")
+        }
+        PresetSeeder.seedIfNeeded(container.mainContext)
+        DefaultNames.relocalize(container.mainContext)
+        return container
+    }()
 }
 
 /// Creates the example timers once, on first launch (SPEC D9).
@@ -48,7 +57,7 @@ enum PresetSeeder {
         for (index, preset) in Presets.all(names).enumerated() {
             context.insert(SavedTimer(name: preset.name, definition: preset.definition, sortIndex: index))
         }
-        try? context.save()
+        context.saveOrReport()
         UserDefaults.standard.set(true, forKey: key)
     }
 }
@@ -70,7 +79,7 @@ enum DefaultNames {
             var definition = timer.definition
             if definition.renameSteps({ names[$0] }) { timer.definition = definition }
         }
-        if context.hasChanges { try? context.save() }
+        if context.hasChanges { context.saveOrReport() }
     }
 
     /// The default name in every bundled language → the same name in the current language.

@@ -9,6 +9,8 @@ struct RecordDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Bindable var record: WorkoutRecord
     @State private var confirmingDelete = false
+    /// Restored when the name is cleared.
+    @State private var lastName = ""
 
     var body: some View {
         List {
@@ -36,6 +38,8 @@ struct RecordDetailView: View {
             Section {
                 TextField("Name", text: $record.name)
                     .submitLabel(.done)
+                    .nameLimit($record.name)
+                    .onSubmit { commit() }
                 TextField("Note", text: $record.note, axis: .vertical)
             }
 
@@ -53,7 +57,7 @@ struct RecordDetailView: View {
                     .confirmationDialog("Delete this workout?", isPresented: $confirmingDelete, titleVisibility: .visible) {
                         Button("Delete", role: .destructive) {
                             context.delete(record)
-                            try? context.save()
+                            context.saveOrReport()
                             dismiss()
                         }
                     }
@@ -62,6 +66,22 @@ struct RecordDetailView: View {
         .scrollDismissesKeyboard(.immediately)
         .navigationTitle(record.name)
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear { lastName = record.name }
+        .onDisappear { commit() }
+    }
+
+    /// Saves the edited name and note explicitly (TECH T1); an empty name falls back to the previous one.
+    private func commit() {
+        guard !record.isDeleted, record.modelContext != nil else { return }
+        let trimmed = record.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            record.name = lastName
+        } else {
+            if trimmed != record.name { record.name = trimmed }
+            lastName = trimmed
+        }
+        guard context.hasChanges else { return }
+        context.saveOrReport()
     }
 
     private func repeatWorkout() {

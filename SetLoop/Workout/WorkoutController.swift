@@ -60,6 +60,7 @@ final class WorkoutController {
             case .skip: self?.skip()
             }
         }
+        WorkoutCommands.flush = { [weak self] in await self?.liveActivity.flush() }
         if settings.showOnLockScreen {
             liveActivity.start(timerName: name, state: activityState())
         }
@@ -70,8 +71,16 @@ final class WorkoutController {
         scheduleNextCue()
     }
 
-    func pause() { mutate { $0.pause(at: $1) } }
-    func resume() { mutate { $0.resume(at: $1) } }
+    func pause() {
+        mutate { $0.pause(at: $1) }
+        if engine?.phase == .paused { audio.pause() }
+    }
+
+    func resume() {
+        mutate { $0.resume(at: $1) }
+        if engine?.phase == .running { audio.resume() }
+    }
+
     func togglePause() { engine?.phase == .paused ? resume() : pause() }
     func skip() { mutate { $0.skip(at: $1) }; announceStep() }
     func back() { mutate { $0.back(at: $1) }; announceStep() }
@@ -169,7 +178,7 @@ final class WorkoutController {
         let running = engine.phase == .running
         let stepEnd = Date.now.addingTimeInterval(remaining)
         return .init(
-            stepName: step.step.name,
+            stepName: step.step.name.cappedName,
             stepType: step.type,
             color: colors[step.type],
             stepEnd: running ? stepEnd : nil,

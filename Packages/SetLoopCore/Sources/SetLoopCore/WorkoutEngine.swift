@@ -50,12 +50,6 @@ public struct WorkoutEngine: Sendable {
         return max(TimeInterval(step.duration) - stepElapsed(at: now), 0)
     }
 
-    public func totalRemaining(at now: TimeInterval) -> TimeInterval {
-        guard currentStep != nil else { return 0 }
-        let later = plan.steps[(currentIndex + 1)...].reduce(0) { $0 + $1.duration }
-        return stepRemaining(at: now) + TimeInterval(later)
-    }
-
     /// Time spent running, without pauses. Repeated steps (after "Back") count again.
     public func activeTime(at now: TimeInterval) -> TimeInterval {
         activeTimeBase + (runningSince.map { now - $0 } ?? 0)

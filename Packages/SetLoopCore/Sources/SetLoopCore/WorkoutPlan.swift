@@ -71,3 +71,40 @@ public struct WorkoutPlan: Hashable, Sendable {
 extension TimerDefinition {
     public var plan: WorkoutPlan { WorkoutPlan(self) }
 }
+
+// MARK: - Plan arithmetic
+
+/// Plan totals computed from the structure: limits allow millions of steps, too many to build for a list row.
+extension TimerDefinition {
+    /// The plan's final set step, when `skipLastRest` drops it.
+    private var droppedLastRest: Step? {
+        guard skipLastRest, let last = blocks.last(where: { !$0.steps.isEmpty })?.steps.last,
+              last.type == .rest else { return nil }
+        return last
+    }
+
+    /// Sums `value` over the plan's steps without building it.
+    private func planSum(_ value: (Step) -> Int) -> Int {
+        let setCount = max(sets, 1)
+        let perSet = blocks.reduce(0) { sum, block in
+            sum + block.steps.reduce(0) { $0 + value($1) } * max(block.repeats, 1)
+        }
+        var total = perSet * setCount
+        if let rest = restBetweenSets { total += value(rest) * (setCount - 1) }
+        if let dropped = droppedLastRest { total -= value(dropped) }
+        if let prepare { total += value(prepare) }
+        if let cooldown { total += value(cooldown) }
+        return total
+    }
+
+    /// `plan.steps.count`.
+    public var stepCount: Int { planSum { _ in 1 } }
+
+    /// `plan.totalDuration`.
+    public var totalDuration: Int { planSum(\.duration) }
+
+    /// `plan.duration(of:)`.
+    public func duration(of category: StepType.Category) -> Int {
+        planSum { $0.type.category == category ? $0.duration : 0 }
+    }
+}

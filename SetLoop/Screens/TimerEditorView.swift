@@ -39,7 +39,16 @@ struct TimerEditorView: View {
         return result
     }
 
-    private var isValid: Bool { (try? cleaned.validate()) != nil }
+    private var validationError: TimerDefinition.ValidationError? {
+        do throws(TimerDefinition.ValidationError) {
+            try cleaned.validate()
+            return nil
+        } catch {
+            return error
+        }
+    }
+
+    private var isValid: Bool { validationError == nil }
 
     var body: some View {
         NavigationStack {
@@ -50,6 +59,7 @@ struct TimerEditorView: View {
                         // Return reads "Done" and closes the keyboard.
                         .submitLabel(.done)
                         .focused($nameFocused)
+                        .nameLimit($name)
                 }
                 general
                 ForEach(draft.blocks) { block in
@@ -124,7 +134,14 @@ struct TimerEditorView: View {
         } header: {
             Text("Finish")
         } footer: {
-            Text("Removes only the rest at the very end of the workout. Rest between blocks and sets stays.")
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Removes only the rest at the very end of the workout. Rest between blocks and sets stays.")
+                // The reason Done is disabled, which is otherwise hard to guess.
+                if validationError == .emptyPlan {
+                    Text("Nothing to run: the only step is the last rest, which is skipped.")
+                        .foregroundStyle(.red)
+                }
+            }
         }
     }
 
@@ -212,7 +229,7 @@ struct TimerEditorView: View {
             HStack {
                 Text("Total").foregroundStyle(.secondary)
                 Spacer()
-                Text(WorkoutFormat.duration(cleaned.plan.totalDuration)).fontWeight(.semibold).monospacedDigit()
+                Text(WorkoutFormat.duration(cleaned.totalDuration)).fontWeight(.semibold).monospacedDigit()
             }
             .font(.subheadline)
             TimerStrip(definition: cleaned, colors: workout.colors, height: 8)
@@ -328,7 +345,7 @@ struct TimerEditorView: View {
             let sortIndex = ((try? context.fetch(last))?.first?.sortIndex ?? -1) + 1
             context.insert(SavedTimer(name: finalName, definition: cleaned, sortIndex: sortIndex))
         }
-        try? context.save()
+        context.saveOrReport()
         dismiss()
     }
 

@@ -1,6 +1,16 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Open SetLoop to continue": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Откройте SetLoop, чтобы продолжить"
+          }
+        }
+      }
+    },
     "Pause": {
       "localizations": {
         "ru": {

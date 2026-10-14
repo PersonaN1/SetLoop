@@ -35,6 +35,6 @@ enum WorkoutFormat {
     }
 
     static func next(_ step: PlannedStep) -> String {
-        String(localized: "Next: \(step.step.name) \(time(TimeInterval(step.duration)))")
+        String(localized: "Next: \(step.step.name.cappedName) \(time(TimeInterval(step.duration)))")
     }
 }

@@ -929,6 +929,16 @@
         }
       }
     },
+    "Nothing to run: the only step is the last rest, which is skipped.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нечего запускать: единственный шаг — последний отдых, а он пропускается."
+          }
+        }
+      }
+    },
     "OK": {
       "localizations": {
         "ru": {

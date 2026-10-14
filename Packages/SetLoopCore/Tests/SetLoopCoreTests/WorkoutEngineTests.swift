@@ -25,7 +25,6 @@ private func engine() -> WorkoutEngine {
         e.update(at: 12) // 2 s into rest
         #expect(e.currentIndex == 1)
         #expect(e.stepRemaining(at: 12) == 3)
-        #expect(e.totalRemaining(at: 12) == 13)
     }
 
     @Test func pauseFreezesTime() {

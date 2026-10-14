@@ -136,7 +136,7 @@ struct TimerListView: View {
         for (index, timer) in ordered.enumerated() where timer.sortIndex != index {
             timer.sortIndex = index
         }
-        try? context.save()
+        context.saveOrReport()
     }
 }
 
@@ -144,10 +144,15 @@ private enum EditorTarget: Identifiable {
     case new
     case edit(SavedTimer)
 
-    var id: String {
+    enum ID: Hashable {
+        case new
+        case edit(PersistentIdentifier)
+    }
+
+    var id: ID {
         switch self {
-        case .new: "new"
-        case .edit(let timer): "\(timer.persistentModelID.hashValue)"
+        case .new: .new
+        case .edit(let timer): .edit(timer.persistentModelID)
         }
     }
 

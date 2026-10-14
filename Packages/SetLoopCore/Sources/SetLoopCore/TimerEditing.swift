@@ -30,8 +30,10 @@ extension TimerDefinition {
         }
         replacement.append(Block(steps: Array(block.steps[first...last]), repeats: 2))
         if last < block.steps.count - 1 {
-            replacement.append(Block(id: block.id, steps: Array(block.steps[(last + 1)...]), repeats: block.repeats))
+            replacement.append(Block(steps: Array(block.steps[(last + 1)...]), repeats: block.repeats))
         }
+        // The first piece stays the original block, so the list keeps its identity in place.
+        replacement[0].id = block.id
         guard blocks.count - 1 + replacement.count <= Limits.maxBlocks else { throw .tooManyBlocks }
         blocks.replaceSubrange(blockIndex...blockIndex, with: replacement)
     }

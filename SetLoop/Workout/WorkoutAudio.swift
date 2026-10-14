@@ -14,10 +14,11 @@ final class WorkoutAudio {
 
     private let settings: AppSettings
     private let session = AVAudioSession.sharedInstance()
-    private let engine = AVAudioEngine()
+    /// Recreated with its players after the media services reset.
+    private var engine = AVAudioEngine()
     /// Ticks and step signals overlap: a tick must not cut the step sound's tail.
-    private let tickPlayer = AVAudioPlayerNode()
-    private let stepPlayer = AVAudioPlayerNode()
+    private var tickPlayer = AVAudioPlayerNode()
+    private var stepPlayer = AVAudioPlayerNode()
     private let format = AVAudioFormat(standardFormatWithSampleRate: SoundSynth.sampleRate, channels: 1)!
     private let speech = AVSpeechSynthesizer()
     private var buffers: [String: AVAudioPCMBuffer] = [:]
@@ -25,16 +26,15 @@ final class WorkoutAudio {
     private var observers: [NSObjectProtocol] = []
 
     private var isActive = false
+    /// The workout is paused: the engine and session are released until it resumes.
+    private var isPaused = false
     private var isDucked = false
     private var unduckTask: Task<Void, Never>?
     private var endTask: Task<Void, Never>?
 
     init(settings: AppSettings) {
         self.settings = settings
-        for player in players {
-            engine.attach(player)
-            engine.connect(player, to: engine.mainMixerNode, format: format)
-        }
+        connectPlayers()
         observe()
     }
 
@@ -55,11 +55,24 @@ final class WorkoutAudio {
         unduckTask?.cancel()
         guard isActive else { return }
         isActive = false
-        isDucked = false
+        isPaused = false
         speech.stopSpeaking(at: .immediate)
-        players.forEach { $0.stop() }
-        engine.stop()
-        try? session.setActive(false, options: .notifyOthersOnDeactivation)
+        release()
+    }
+
+    /// Nothing plays during a pause, so no silence is rendered either (TECH T2).
+    func pause() {
+        guard isActive, !isPaused else { return }
+        isPaused = true
+        speech.stopSpeaking(at: .immediate)
+        release()
+    }
+
+    /// The session is mixable, so it can be activated again from the Live Activity in the background.
+    func resume() {
+        guard isActive, isPaused else { return }
+        isPaused = false
+        configure(ducked: false)
     }
 
     /// "3-2-1": spoken when the voice is on, otherwise a tick.
@@ -109,7 +122,7 @@ final class WorkoutAudio {
 
     /// The app is back in front: restart audio if an interruption ended without notice.
     func resumeIfNeeded() {
-        guard isActive, !engine.isRunning || isDucked else { return }
+        guard isActive, !isPaused, !engine.isRunning || isDucked else { return }
         configure(ducked: false)
     }
 
@@ -120,6 +133,7 @@ final class WorkoutAudio {
     private func play(_ cue: SoundCue, set: SoundSet? = nil) -> TimeInterval {
         guard isActive, let set = set ?? settings.soundSet else { return 0 }
         duck()
+        guard engine.isRunning else { return 0 }
         let buffer = buffer(cue, set)
         let player = cue == .countdown ? tickPlayer : stepPlayer
         player.scheduleBuffer(buffer, at: nil, options: .interrupts)
@@ -133,7 +147,7 @@ final class WorkoutAudio {
         guard isActive, settings.voicePrompts, !text.isEmpty else { return }
         duck()
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = Self.voice
+        utterance.voice = voice
         utterance.preUtteranceDelay = delay
         speech.stopSpeaking(at: .immediate)
         speech.speak(utterance)
@@ -157,19 +171,25 @@ final class WorkoutAudio {
         return buffer
     }
 
-    /// The voice speaks the interface language (SPEC D12).
-    private static var voice: AVSpeechSynthesisVoice? {
+    /// The voice speaks the interface language (SPEC D12); looked up once.
+    private lazy var voice: AVSpeechSynthesisVoice? = {
         let language = Bundle.main.preferredLocalizations.first ?? "en"
+        // The full code keeps the user's region ("en-GB"), when it is the same language.
         let current = AVSpeechSynthesisVoice.currentLanguageCode()
-        if current.hasPrefix(language) { return AVSpeechSynthesisVoice(language: current) }
-        return AVSpeechSynthesisVoice.speechVoices().first { $0.language.hasPrefix(language) }
-    }
+        if current.hasPrefix(language), let voice = AVSpeechSynthesisVoice(language: current) { return voice }
+        return AVSpeechSynthesisVoice(language: language)
+    }()
 
     // MARK: - Session
 
     /// Music is ducked for the signal, not for the whole workout (SPEC D5).
     private func duck() {
         unduckTask?.cancel()
+        // The ambient category never ducks: restarting would only cut the sound just scheduled.
+        guard settings.ignoreSilentMode else {
+            if !engine.isRunning { configure(ducked: false) }
+            return
+        }
         guard !isDucked else { return }
         configure(ducked: true)
     }
@@ -182,12 +202,23 @@ final class WorkoutAudio {
             while self?.speech.isSpeaking == true, !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(300))
             }
-            guard !Task.isCancelled, let self, self.isDucked else { return }
+            guard !Task.isCancelled, let self else { return }
+            // A signal on Skip or Back during a pause woke the audio; it goes back to sleep.
+            if self.isPaused { return self.release() }
+            guard self.isDucked else { return }
             // Restarting the session in the background lets iOS suspend the app mid-workout,
             // so the music stays ducked until the app is back in front or the workout ends.
             guard UIApplication.shared.applicationState == .active else { return }
             self.configure(ducked: false)
         }
+    }
+
+    private func release() {
+        unduckTask?.cancel()
+        isDucked = false
+        players.forEach { $0.stop() }
+        engine.stop()
+        try? session.setActive(false, options: .notifyOthersOnDeactivation)
     }
 
     /// Ducking is applied on activation, so the session is restarted to switch it.
@@ -215,34 +246,51 @@ final class WorkoutAudio {
         }
     }
 
+    private func connectPlayers() {
+        for player in players {
+            engine.attach(player)
+            engine.connect(player, to: engine.mainMixerNode, format: format)
+        }
+    }
+
+    /// After a media services reset the old engine and nodes are unusable. The buffers are plain PCM and stay.
+    private func rebuildEngine() {
+        players.forEach { $0.stop() }
+        engine.stop()
+        engine = AVAudioEngine()
+        tickPlayer = AVAudioPlayerNode()
+        stepPlayer = AVAudioPlayerNode()
+        connectPlayers()
+        isDucked = false
+        guard isActive, !isPaused else { return }
+        configure(ducked: false)
+    }
+
     private func observe() {
         let center = NotificationCenter.default
         observers.append(center.addObserver(forName: AVAudioSession.interruptionNotification, object: session, queue: .main) { [weak self] note in
             let info = note.userInfo
             let type = (info?[AVAudioSessionInterruptionTypeKey] as? UInt).flatMap(AVAudioSession.InterruptionType.init)
-            let reason = (info?[AVAudioSessionInterruptionReasonKey] as? UInt).flatMap(AVAudioSession.InterruptionReason.init)
-            MainActor.assumeIsolated { self?.handleInterruption(type, reason: reason) }
+            MainActor.assumeIsolated { self?.handleInterruption(type) }
         })
-        // Headphones and other route changes stop the engine.
-        observers.append(center.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main) { [weak self] _ in
+        // Headphones and other route changes stop the engine. Any engine: this one may be rebuilt.
+        observers.append(center.addObserver(forName: .AVAudioEngineConfigurationChange, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.resumeIfNeeded() }
         })
         observers.append(center.addObserver(forName: AVAudioSession.mediaServicesWereResetNotification, object: nil, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.resumeIfNeeded() }
+            MainActor.assumeIsolated { self?.rebuildEngine() }
         })
     }
 
-    private func handleInterruption(_ type: AVAudioSession.InterruptionType?, reason: AVAudioSession.InterruptionReason?) {
+    private func handleInterruption(_ type: AVAudioSession.InterruptionType?) {
         guard isActive, let type else { return }
         switch type {
         case .began:
             isDucked = false
-            // Delivered late after the app was frozen: nothing actually interrupted the workout.
-            if reason == .appWasSuspended { return }
             onInterruptionBegan?()
         case .ended:
-            // The workout stays paused (SPEC D6); only the audio comes back.
-            configure(ducked: false)
+            // The workout stays paused (SPEC D6); the audio comes back on resume.
+            if !isPaused { configure(ducked: false) }
         @unknown default:
             break
         }
