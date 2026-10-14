@@ -345,7 +345,7 @@ struct TimerEditorView: View {
             let sortIndex = ((try? context.fetch(last))?.first?.sortIndex ?? -1) + 1
             context.insert(SavedTimer(name: finalName, definition: cleaned, sortIndex: sortIndex))
         }
-        try? context.save()
+        context.saveOrReport()
         dismiss()
     }
 

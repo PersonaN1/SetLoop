@@ -24,7 +24,7 @@ struct HistoryView: View {
                                 .swipeActions {
                                     Button("Delete", systemImage: "trash", role: .destructive) {
                                         context.delete(record)
-                                        try? context.save()
+                                        context.saveOrReport()
                                     }
                                 }
                         }

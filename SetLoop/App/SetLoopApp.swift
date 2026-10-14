@@ -57,7 +57,7 @@ enum PresetSeeder {
         for (index, preset) in Presets.all(names).enumerated() {
             context.insert(SavedTimer(name: preset.name, definition: preset.definition, sortIndex: index))
         }
-        try? context.save()
+        context.saveOrReport()
         UserDefaults.standard.set(true, forKey: key)
     }
 }
@@ -79,7 +79,7 @@ enum DefaultNames {
             var definition = timer.definition
             if definition.renameSteps({ names[$0] }) { timer.definition = definition }
         }
-        if context.hasChanges { try? context.save() }
+        if context.hasChanges { context.saveOrReport() }
     }
 
     /// The default name in every bundled language → the same name in the current language.

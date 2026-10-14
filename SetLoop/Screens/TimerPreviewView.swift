@@ -72,7 +72,7 @@ struct TimerPreviewView: View {
                 .confirmationDialog("Delete this timer?", isPresented: $confirmingDelete, titleVisibility: .visible) {
                     Button("Delete", role: .destructive) {
                         context.delete(timer)
-                        try? context.save()
+                        context.saveOrReport()
                         dismiss()
                     }
                 } message: {

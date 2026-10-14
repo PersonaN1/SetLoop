@@ -109,7 +109,7 @@ struct SummaryView: View {
             summary: summary,
             definition: workout.definition
         ))
-        try? context.save()
+        context.saveOrReport()
         workout.close()
     }
 

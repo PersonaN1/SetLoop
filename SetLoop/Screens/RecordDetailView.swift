@@ -57,7 +57,7 @@ struct RecordDetailView: View {
                     .confirmationDialog("Delete this workout?", isPresented: $confirmingDelete, titleVisibility: .visible) {
                         Button("Delete", role: .destructive) {
                             context.delete(record)
-                            try? context.save()
+                            context.saveOrReport()
                             dismiss()
                         }
                     }
@@ -81,7 +81,7 @@ struct RecordDetailView: View {
             lastName = trimmed
         }
         guard context.hasChanges else { return }
-        try? context.save()
+        context.saveOrReport()
     }
 
     private func repeatWorkout() {

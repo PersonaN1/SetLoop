@@ -21,7 +21,15 @@ final class SavedTimer {
     }
 
     var definition: TimerDefinition {
-        get { (try? JSONDecoder().decode(TimerDefinition.self, from: definitionData)) ?? TimerDefinition(blocks: []) }
+        get {
+            do {
+                return try JSONDecoder().decode(TimerDefinition.self, from: definitionData)
+            } catch {
+                // Logged only: a damaged timer shows up empty instead of stopping the app.
+                Persistence.logger.error("Timer definition can't be decoded: \(String(describing: error), privacy: .public)")
+                return TimerDefinition(blocks: [])
+            }
+        }
         set {
             definitionData = (try? JSONEncoder().encode(newValue)) ?? Data()
             totalDuration = newValue.totalDuration
