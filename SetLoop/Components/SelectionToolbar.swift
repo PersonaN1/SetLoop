@@ -40,6 +40,8 @@ struct SelectionToolbar: ViewModifier {
                     }
                 }
             }
+            // As in Files and Photos: the tab bar gives way to the selection actions.
+            .toolbar(editMode.isEditing ? .hidden : .automatic, for: .tabBar)
             .onChange(of: allIDs) { selection.formIntersection($1) }
             // Set last so the list and everything around it share one edit mode.
             .environment(\.editMode, $editMode)
