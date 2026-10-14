@@ -26,12 +26,6 @@ final class WorkoutController {
         origin = clock.now
         audio = WorkoutAudio(settings: settings)
         audio.onInterruptionBegan = { [weak self] in self?.interrupted() }
-        WorkoutCommands.handler = { [weak self] command in
-            switch command {
-            case .togglePause: self?.togglePause()
-            case .skip: self?.skip()
-            }
-        }
     }
 
     var isPresented: Bool { engine != nil }
@@ -59,6 +53,13 @@ final class WorkoutController {
         self.definition = definition
         timerName = name
         startedAt = .now
+        // Here, not in init: SwiftUI may build the App, and so a spare controller, more than once.
+        WorkoutCommands.handler = { [weak self] command in
+            switch command {
+            case .togglePause: self?.togglePause()
+            case .skip: self?.skip()
+            }
+        }
         if settings.showOnLockScreen {
             liveActivity.start(timerName: name, state: activityState())
         }
