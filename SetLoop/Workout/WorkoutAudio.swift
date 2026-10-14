@@ -14,10 +14,11 @@ final class WorkoutAudio {
 
     private let settings: AppSettings
     private let session = AVAudioSession.sharedInstance()
-    private let engine = AVAudioEngine()
+    /// Recreated with its players after the media services reset.
+    private var engine = AVAudioEngine()
     /// Ticks and step signals overlap: a tick must not cut the step sound's tail.
-    private let tickPlayer = AVAudioPlayerNode()
-    private let stepPlayer = AVAudioPlayerNode()
+    private var tickPlayer = AVAudioPlayerNode()
+    private var stepPlayer = AVAudioPlayerNode()
     private let format = AVAudioFormat(standardFormatWithSampleRate: SoundSynth.sampleRate, channels: 1)!
     private let speech = AVSpeechSynthesizer()
     private var buffers: [String: AVAudioPCMBuffer] = [:]
@@ -33,10 +34,7 @@ final class WorkoutAudio {
 
     init(settings: AppSettings) {
         self.settings = settings
-        for player in players {
-            engine.attach(player)
-            engine.connect(player, to: engine.mainMixerNode, format: format)
-        }
+        connectPlayers()
         observe()
     }
 
@@ -247,6 +245,26 @@ final class WorkoutAudio {
         }
     }
 
+    private func connectPlayers() {
+        for player in players {
+            engine.attach(player)
+            engine.connect(player, to: engine.mainMixerNode, format: format)
+        }
+    }
+
+    /// After a media services reset the old engine and nodes are unusable. The buffers are plain PCM and stay.
+    private func rebuildEngine() {
+        players.forEach { $0.stop() }
+        engine.stop()
+        engine = AVAudioEngine()
+        tickPlayer = AVAudioPlayerNode()
+        stepPlayer = AVAudioPlayerNode()
+        connectPlayers()
+        isDucked = false
+        guard isActive, !isPaused else { return }
+        configure(ducked: false)
+    }
+
     private func observe() {
         let center = NotificationCenter.default
         observers.append(center.addObserver(forName: AVAudioSession.interruptionNotification, object: session, queue: .main) { [weak self] note in
@@ -254,12 +272,12 @@ final class WorkoutAudio {
             let type = (info?[AVAudioSessionInterruptionTypeKey] as? UInt).flatMap(AVAudioSession.InterruptionType.init)
             MainActor.assumeIsolated { self?.handleInterruption(type) }
         })
-        // Headphones and other route changes stop the engine.
-        observers.append(center.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main) { [weak self] _ in
+        // Headphones and other route changes stop the engine. Any engine: this one may be rebuilt.
+        observers.append(center.addObserver(forName: .AVAudioEngineConfigurationChange, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.resumeIfNeeded() }
         })
         observers.append(center.addObserver(forName: AVAudioSession.mediaServicesWereResetNotification, object: nil, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.resumeIfNeeded() }
+            MainActor.assumeIsolated { self?.rebuildEngine() }
         })
     }
 
