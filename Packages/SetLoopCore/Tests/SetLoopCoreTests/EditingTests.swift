@@ -78,3 +78,27 @@ private func step(_ name: String, _ type: StepType = .workA, _ duration: Int = 1
         #expect(strip.groups[1].segments.count == 1)
     }
 }
+
+@Suite struct TimerNamingTests {
+    @Test func freeNameStaysAsIs() {
+        #expect(TimerNaming.unique("New Timer", among: ["Tabata"]) == "New Timer")
+    }
+
+    @Test func takenNameGetsNextNumber() {
+        #expect(TimerNaming.unique("New Timer", among: ["New Timer"]) == "New Timer (2)")
+        #expect(TimerNaming.unique("New Timer", among: ["New Timer", "New Timer (2)"]) == "New Timer (3)")
+    }
+
+    @Test func fillsTheFirstGap() {
+        #expect(TimerNaming.unique("A", among: ["A", "A (3)"]) == "A (2)")
+    }
+
+    @Test func copyOfNumberedNameContinuesTheSeries() {
+        #expect(TimerNaming.unique("A (2)", among: ["A", "A (2)"]) == "A (3)")
+    }
+
+    @Test func otherParenthesesAreKept() {
+        #expect(TimerNaming.unique("Run (easy)", among: ["Run (easy)"]) == "Run (easy) (2)")
+        #expect(TimerNaming.unique("Set (1)", among: ["Set (1)"]) == "Set (1) (2)")
+    }
+}

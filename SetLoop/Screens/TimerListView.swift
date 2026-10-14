@@ -54,6 +54,10 @@ struct TimerListView: View {
             .navigationDestination(for: SavedTimer.self) { TimerPreviewView(timer: $0) }
             .toolbar {
                 if !editMode.isEditing {
+                    // iOS 26+ merges neighbouring items into one glass capsule; keep "+" on its own.
+                    if #available(iOS 26, *) {
+                        ToolbarSpacer(.fixed, placement: .topBarTrailing)
+                    }
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("New Timer", systemImage: "plus") { add() }
                     }

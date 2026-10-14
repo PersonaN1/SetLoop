@@ -44,7 +44,8 @@ struct TimerEditorView: View {
         NavigationStack {
             List(selection: $selection) {
                 Section {
-                    TextField("Name", text: $name)
+                    // An empty name falls back to the numbered default shown as the prompt.
+                    TextField("Name", text: $name, prompt: Text("New Timer"))
                 }
                 general
                 ForEach(draft.blocks) { block in
@@ -304,7 +305,12 @@ struct TimerEditorView: View {
 
     private func save() {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        let finalName = trimmed.isEmpty ? String(localized: "Timer") : trimmed
+        let others = ((try? context.fetch(FetchDescriptor<SavedTimer>())) ?? [])
+            .filter { $0 !== timer }
+            .map(\.name)
+        let finalName = trimmed.isEmpty
+            ? TimerNaming.unique(String(localized: "New Timer"), among: others)
+            : trimmed
         if let timer {
             timer.name = finalName
             timer.definition = cleaned

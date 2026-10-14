@@ -128,7 +128,7 @@ extension ModelContext {
         let all = (try? fetch(FetchDescriptor<SavedTimer>())) ?? []
         guard all.count < Limits.maxTimers else { return false }
         for other in all where other.sortIndex > timer.sortIndex { other.sortIndex += 1 }
-        insert(SavedTimer(name: String(localized: "\(timer.name) Copy"),
+        insert(SavedTimer(name: TimerNaming.unique(timer.name, among: all.map(\.name)),
                           definition: timer.definition,
                           sortIndex: timer.sortIndex + 1))
         try? save()
