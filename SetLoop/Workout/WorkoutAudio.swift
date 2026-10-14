@@ -170,6 +170,11 @@ final class WorkoutAudio {
     /// Music is ducked for the signal, not for the whole workout (SPEC D5).
     private func duck() {
         unduckTask?.cancel()
+        // The ambient category never ducks: restarting would only cut the sound just scheduled.
+        guard settings.ignoreSilentMode else {
+            if !engine.isRunning { configure(ducked: false) }
+            return
+        }
         guard !isDucked else { return }
         configure(ducked: true)
     }
