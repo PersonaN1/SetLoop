@@ -90,7 +90,7 @@ public struct WorkoutEngine: Sendable {
         var transitions: [Transition] = []
         while let step = currentStep, stepElapsed(at: now) >= TimeInterval(step.duration) {
             let overflow = stepElapsed(at: now) - TimeInterval(step.duration)
-            log.append(StepRecord(planIndex: currentIndex, step: step.step, outcome: .completed))
+            log.append(StepRecord(planIndex: currentIndex, step: step.step, outcome: .completed, elapsed: step.duration))
             advance(startingAt: now - overflow, now: now)
             transitions.append(phase == .running ? .stepStarted(currentIndex) : .finished)
         }
@@ -115,7 +115,8 @@ public struct WorkoutEngine: Sendable {
     public mutating func skip(at now: TimeInterval) {
         update(at: now)
         guard isActive, let step = currentStep else { return }
-        log.append(StepRecord(planIndex: currentIndex, step: step.step, outcome: .skipped))
+        log.append(StepRecord(planIndex: currentIndex, step: step.step, outcome: .skipped,
+                              elapsed: Self.seconds(stepElapsed(at: now))))
         advance(startingAt: now, now: now)
     }
 
@@ -135,7 +136,8 @@ public struct WorkoutEngine: Sendable {
         update(at: now)
         guard isActive else { return }
         if let step = currentStep, stepElapsed(at: now) > 0 {
-            log.append(StepRecord(planIndex: currentIndex, step: step.step, outcome: .interrupted))
+            log.append(StepRecord(planIndex: currentIndex, step: step.step, outcome: .interrupted,
+                                  elapsed: Self.seconds(stepElapsed(at: now))))
         }
         stopClock(at: now)
         phase = .finished(.partial)
@@ -144,6 +146,8 @@ public struct WorkoutEngine: Sendable {
     // MARK: - Private
 
     private var isActive: Bool { phase == .running || phase == .paused }
+
+    private static func seconds(_ time: TimeInterval) -> Int { Int(time.rounded()) }
 
     private mutating func advance(startingAt start: TimeInterval, now: TimeInterval) {
         let wasRunning = phase == .running
@@ -191,6 +195,24 @@ public struct StepRecord: Codable, Hashable, Sendable {
     public var planIndex: Int
     public var step: Step
     public var outcome: Outcome
+    /// Seconds actually spent on the step: the full duration when completed, less when skipped or interrupted.
+    public var elapsed: Int
+
+    public init(planIndex: Int, step: Step, outcome: Outcome, elapsed: Int) {
+        self.planIndex = planIndex
+        self.step = step
+        self.outcome = outcome
+        self.elapsed = elapsed
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        planIndex = try container.decode(Int.self, forKey: .planIndex)
+        step = try container.decode(Step.self, forKey: .step)
+        outcome = try container.decode(Outcome.self, forKey: .outcome)
+        // Records saved before `elapsed` existed only counted completed steps.
+        elapsed = try container.decodeIfPresent(Int.self, forKey: .elapsed) ?? (outcome == .completed ? step.duration : 0)
+    }
 }
 
 public struct Cue: Equatable, Sendable {

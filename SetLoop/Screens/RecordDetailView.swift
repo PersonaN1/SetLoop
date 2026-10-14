@@ -78,7 +78,12 @@ private struct StepRow: View {
             Circle().fill(color).frame(width: 10, height: 10)
             Text(record.step.name)
             Spacer()
-            Text(WorkoutFormat.duration(record.step.duration)).monospacedDigit().foregroundStyle(.secondary)
+            // Time actually spent; a step left early also shows its planned length.
+            Text(record.outcome == .completed
+                 ? WorkoutFormat.duration(record.elapsed)
+                 : "\(WorkoutFormat.duration(record.elapsed)) / \(WorkoutFormat.duration(record.step.duration))")
+                .monospacedDigit()
+                .foregroundStyle(.secondary)
             outcome
         }
         .opacity(record.outcome == .skipped ? 0.5 : 1)

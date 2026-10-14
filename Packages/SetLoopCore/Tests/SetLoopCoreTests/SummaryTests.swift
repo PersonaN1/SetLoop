@@ -25,7 +25,7 @@ import Testing
         #expect(summary.completedSteps == 4)
         #expect(summary.time(of: .work) == 40)
         #expect(summary.time(of: .rest) == 10)
-        #expect(summary.time(of: .other) == 30)
+        #expect(summary.time(of: .other) == 35) // 5 s of the skipped prepare count
         #expect(summary.duration == 85)
     }
 
@@ -38,8 +38,17 @@ import Testing
         #expect(summary.status == .partial)
         #expect(summary.steps.map(\.outcome) == [.completed, .interrupted])
         #expect(summary.completedSteps == 1)
-        #expect(summary.time(of: .work) == 0)
+        #expect(summary.time(of: .work) == 5) // the interrupted part counts
         #expect(summary.duration == 15)
+    }
+
+    @Test func oldRecordsWithoutElapsedDecode() throws {
+        let json = #"""
+        [{"planIndex":0,"step":{"id":"00000000-0000-0000-0000-000000000001","name":"Work","type":"workA","duration":20},"outcome":"completed"},
+         {"planIndex":1,"step":{"id":"00000000-0000-0000-0000-000000000002","name":"Rest","type":"rest","duration":10},"outcome":"skipped"}]
+        """#
+        let steps = try JSONDecoder().decode([StepRecord].self, from: Data(json.utf8))
+        #expect(steps.map(\.elapsed) == [20, 0])
     }
 
     @Test func noSummaryWhileRunning() {
