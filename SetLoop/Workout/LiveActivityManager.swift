@@ -16,7 +16,6 @@ final class LiveActivityManager {
     func start(timerName: String, state: WorkoutActivityAttributes.ContentState?) {
         Self.endAll()
         guard let state, ActivityAuthorizationInfo().areActivitiesEnabled else { return }
-        // TODO: respect the "Show on lock screen" setting (SPEC D7).
         activityID = try? Activity.request(
             attributes: WorkoutActivityAttributes(timerName: timerName),
             content: .init(state: state, staleDate: nil)
