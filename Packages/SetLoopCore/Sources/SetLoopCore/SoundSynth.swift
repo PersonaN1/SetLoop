@@ -105,6 +105,13 @@ public enum SoundSynth {
         static let tink = Voice(partials: [(1, 1, 0.12), (2.76, 0.3, 0.04)], attack: 0.001)
         static let wood = Voice(partials: [(1, 1, 0.035), (2.6, 0.4, 0.015)], attack: 0.001, drop: 0.3)
         static let tock = Voice(partials: [(1, 1, 0.05), (2, 0.15, 0.02)], attack: 0.001)
+
+        /// Same timbre with a shorter tail.
+        func shortened(_ factor: Double) -> Voice {
+            var voice = self
+            voice.partials = partials.map { ($0.ratio, $0.amplitude, $0.decay * factor) }
+            return voice
+        }
     }
 
     enum Pitch {
@@ -114,25 +121,26 @@ public enum SoundSynth {
 
 extension SoundSet {
     /// Work goes up, rest goes down, finish is a rising run.
+    /// Prepare and cooldown open the workout, so their signal is short.
     func score(_ cue: SoundCue) -> (SoundSynth.Voice, [(frequency: Double, start: TimeInterval)]) {
         typealias P = SoundSynth.Pitch
         switch (self, cue) {
         case (.glass, .countdown): return (.tink, [(1319, 0)])
         case (.glass, .work): return (.glass, [(P.e5, 0), (P.a5, 0.11)])
         case (.glass, .rest): return (.glass, [(P.a5, 0), (P.e5, 0.11)])
-        case (.glass, .other): return (.glass, [(P.g5, 0)])
+        case (.glass, .other): return (.glass.shortened(0.3), [(P.g5, 0)])
         case (.glass, .finish): return (.glass, [(P.c5, 0), (P.e5, 0.12), (P.g5, 0.24), (P.c6, 0.36)])
 
         case (.marimba, .countdown): return (.wood, [(1100, 0)])
         case (.marimba, .work): return (.marimba, [(P.c5, 0), (P.g5, 0.1)])
         case (.marimba, .rest): return (.marimba, [(P.g5, 0), (P.c5, 0.1)])
-        case (.marimba, .other): return (.marimba, [(P.e5, 0)])
+        case (.marimba, .other): return (.marimba.shortened(0.3), [(P.e5, 0)])
         case (.marimba, .finish): return (.marimba, [(P.c5, 0), (P.e5, 0.1), (P.g5, 0.2), (P.c6, 0.3)])
 
         case (.note, .countdown): return (.tock, [(800, 0)])
         case (.note, .work): return (.note, [(P.a4, 0), (P.e5, 0.14)])
         case (.note, .rest): return (.note, [(P.e5, 0), (P.a4, 0.14)])
-        case (.note, .other): return (.note, [(P.c5, 0)])
+        case (.note, .other): return (.note.shortened(0.3), [(P.c5, 0)])
         case (.note, .finish): return (.note, [(P.a4, 0), (P.cSharp5, 0.12), (P.e5, 0.24), (P.a5, 0.36)])
         }
     }
