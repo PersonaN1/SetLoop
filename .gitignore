@@ -66,3 +66,6 @@ fastlane/test_output
 DerivedData/
 .swiftpm/
 *.xcuserstate
+
+# Personal signing team
+Config/Local.xcconfig

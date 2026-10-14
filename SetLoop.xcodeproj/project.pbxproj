@@ -40,6 +40,7 @@
 
 /* Begin PBXFileReference section */
 		325039AB7557874B40D1D655 /* SetLoop.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SetLoop.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5027A777520348FCB32CE165 /* Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Signing.xcconfig; sourceTree = "<group>"; };
 		6BCA30E301B60A407536C14D /* SetLoopWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = SetLoopWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		77902D44BD69C7853B9CD1CA /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		A994097B8892C3FAD80BB359 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
@@ -112,6 +113,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4BE83EC270AFC835986E514F /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				5027A777520348FCB32CE165 /* Signing.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
 		5AB54AC5B7E1B6F2E30DA2F9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -132,6 +141,7 @@
 		D10FEB5AC2237373D66AF16B = {
 			isa = PBXGroup;
 			children = (
+				4BE83EC270AFC835986E514F /* Config */,
 				96B468EA815C7986D28522F4 /* Packages */,
 				1A11604AFECA2D3B86F8FB63 /* SetLoop */,
 				A828578AA326BFA7E2CC424A /* SetLoopWidgets */,
@@ -210,11 +220,9 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					00BDBF1B3D0B67C1DEDCC109 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 					FE1F3A2637E45A2DFC4F5338 = {
-						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -351,6 +359,7 @@
 		};
 		7207E66B32886A067727ADE1 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5027A777520348FCB32CE165 /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -386,7 +395,6 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -422,6 +430,7 @@
 		};
 		FB3F065370D4135DEEA6027F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5027A777520348FCB32CE165 /* Signing.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -457,7 +466,6 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
