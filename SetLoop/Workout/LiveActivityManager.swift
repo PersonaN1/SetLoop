@@ -20,7 +20,7 @@ final class LiveActivityManager {
         Self.endExisting()
         guard let state, ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         activityID = try? Activity.request(
-            attributes: WorkoutActivityAttributes(timerName: timerName),
+            attributes: WorkoutActivityAttributes(timerName: timerName.cappedName),
             content: .init(state: state, staleDate: nil)
         ).id
     }

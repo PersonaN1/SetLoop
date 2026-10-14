@@ -86,3 +86,13 @@ struct TimerStrip: View {
         .clipShape(Capsule())
     }
 }
+
+extension View {
+    /// Cuts a name typed or pasted into a text field to `Limits.maxNameLength`.
+    func nameLimit(_ text: Binding<String>) -> some View {
+        onChange(of: text.wrappedValue) { _, newValue in
+            let capped = newValue.cappedName
+            if capped != newValue { text.wrappedValue = capped }
+        }
+    }
+}

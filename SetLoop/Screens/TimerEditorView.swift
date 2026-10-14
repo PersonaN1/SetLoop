@@ -59,6 +59,7 @@ struct TimerEditorView: View {
                         // Return reads "Done" and closes the keyboard.
                         .submitLabel(.done)
                         .focused($nameFocused)
+                        .nameLimit($name)
                 }
                 general
                 ForEach(draft.blocks) { block in

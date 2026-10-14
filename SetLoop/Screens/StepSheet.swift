@@ -29,6 +29,7 @@ struct StepSheet: View {
                 Section {
                     TextField("Name", text: $step.name)
                         .submitLabel(.done)
+                        .nameLimit($step.name)
                 }
                 if !editing.slot.fixedType {
                     Section("Type") {

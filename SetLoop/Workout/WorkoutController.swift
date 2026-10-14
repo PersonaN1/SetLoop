@@ -170,7 +170,7 @@ final class WorkoutController {
         let running = engine.phase == .running
         let stepEnd = Date.now.addingTimeInterval(remaining)
         return .init(
-            stepName: step.step.name,
+            stepName: step.step.name.cappedName,
             stepType: step.type,
             color: colors[step.type],
             stepEnd: running ? stepEnd : nil,

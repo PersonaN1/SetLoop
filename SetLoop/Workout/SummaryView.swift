@@ -65,6 +65,7 @@ struct SummaryView: View {
         VStack(spacing: 12) {
             TextField("Name", text: $name)
                 .submitLabel(.done)
+                .nameLimit($name)
             TextField("Note (optional)", text: $note, axis: .vertical)
                 .lineLimit(2...5)
         }

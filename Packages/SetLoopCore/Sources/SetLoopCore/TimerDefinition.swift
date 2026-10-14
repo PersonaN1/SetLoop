@@ -93,6 +93,15 @@ public enum Limits {
     public static let maxStepsPerBlock = 30
     public static let stepDuration = 1...5999
     public static let repeats = 1...99
+    /// Timer, step and history names. Keeps the Live Activity state well under its 4 KB limit.
+    public static let maxNameLength = 60
+}
+
+extension String {
+    /// The name cut to `Limits.maxNameLength` characters.
+    public var cappedName: String {
+        count > Limits.maxNameLength ? String(prefix(Limits.maxNameLength)) : self
+    }
 }
 
 extension TimerDefinition {

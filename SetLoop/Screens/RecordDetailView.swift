@@ -36,6 +36,7 @@ struct RecordDetailView: View {
             Section {
                 TextField("Name", text: $record.name)
                     .submitLabel(.done)
+                    .nameLimit($record.name)
                 TextField("Note", text: $record.note, axis: .vertical)
             }
 
