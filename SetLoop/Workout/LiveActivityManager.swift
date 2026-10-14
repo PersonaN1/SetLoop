@@ -8,7 +8,13 @@ final class LiveActivityManager {
     /// Only the ID is kept: `Activity` is not Sendable, so each task looks it up off the main actor.
     private var activityID: String?
 
+    init() {
+        // Activities outlive the app: a killed or reinstalled app leaves its last one on the lock screen.
+        Self.endAll()
+    }
+
     func start(timerName: String, state: WorkoutActivityAttributes.ContentState?) {
+        Self.endAll()
         guard let state, ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         // TODO: respect the "Show on lock screen" setting (SPEC D7).
         activityID = try? Activity.request(
@@ -25,8 +31,15 @@ final class LiveActivityManager {
     func end() {
         guard let activityID else { return }
         self.activityID = nil
+        // Removed at once: a finished workout has nothing left to show (SPEC D7).
+        Task.detached { await Self.activity(activityID)?.end(nil, dismissalPolicy: .immediate) }
+    }
+
+    private nonisolated static func endAll() {
         Task.detached {
-            await Self.activity(activityID)?.end(nil, dismissalPolicy: .after(.now.addingTimeInterval(120)))
+            for activity in Activity<WorkoutActivityAttributes>.activities {
+                await activity.end(nil, dismissalPolicy: .immediate)
+            }
         }
     }
 
