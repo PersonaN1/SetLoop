@@ -3,7 +3,7 @@ import Observation
 import SetLoopCore
 import UIKit
 
-/// The single running workout: drives the engine, Live Activity and (later) sound, haptics and interruptions (TECH T4, T9).
+/// The single running workout: drives the engine, Live Activity, sound, haptics and interruptions (TECH T4, T9).
 @MainActor
 @Observable
 final class WorkoutController {
@@ -19,10 +19,13 @@ final class WorkoutController {
     private let origin: ContinuousClock.Instant
     private var cueTask: Task<Void, Never>?
     private let liveActivity = LiveActivityManager()
+    private let audio: WorkoutAudio
 
     init(settings: AppSettings) {
         self.settings = settings
         origin = clock.now
+        audio = WorkoutAudio(settings: settings)
+        audio.onInterruptionBegan = { [weak self] in self?.interrupted() }
     }
 
     var isPresented: Bool { engine != nil }
@@ -55,21 +58,30 @@ final class WorkoutController {
         }
         // Only matters while the app is in front (SPEC D7).
         UIApplication.shared.isIdleTimerDisabled = settings.keepScreenOn
+        audio.begin()
+        if let step = engine.currentStep { audio.stepStarted(step) }
         scheduleNextCue()
     }
 
     func pause() { mutate { $0.pause(at: $1) } }
     func resume() { mutate { $0.resume(at: $1) } }
     func togglePause() { engine?.phase == .paused ? resume() : pause() }
-    func skip() { mutate { $0.skip(at: $1) } }
-    func back() { mutate { $0.back(at: $1) } }
-    func finish() { mutate { $0.finish(at: $1) } }
+    func skip() { mutate { $0.skip(at: $1) }; announceStep() }
+    func back() { mutate { $0.back(at: $1) }; announceStep() }
+    func finish() { mutate { $0.finish(at: $1) }; audio.end() }
+
+    /// Sound set sample from Settings.
+    func previewSound(_ set: SoundSet) { audio.preview(set) }
+
+    /// Audio may have been taken while the app was away.
+    func appDidBecomeActive() { audio.resumeIfNeeded() }
 
     /// Closes the summary screen.
     func close() {
         cueTask?.cancel()
         engine = nil
         liveActivity.end()
+        audio.end()
         UIApplication.shared.isIdleTimerDisabled = false
     }
 
@@ -107,13 +119,40 @@ final class WorkoutController {
 
     private func handle(_ cue: Cue) {
         guard var engine else { return }
-        // TODO: play countdown / step sounds, voice and haptics (TECH T6).
+        // A frozen app wakes up late: stale signals are not played.
+        let onTime = now - cue.time < 1
+        if case .countdown(let left) = cue.kind, onTime { audio.countdown(left) }
         let transitions = engine.update(at: now)
         self.engine = engine
         if transitions.isEmpty {
             scheduleNextCue()
         } else {
+            // The Lock Screen first: audio work must not hold it back.
             didChangeState()
+        }
+        if onTime, let last = transitions.last { announce(last) }
+    }
+
+    /// Pause on a call, Siri or alarm; no automatic resume (SPEC D6).
+    private func interrupted() {
+        guard settings.pauseOnInterruption, engine?.phase == .running else { return }
+        pause()
+    }
+
+    /// A new step after Skip or Back, or the end when Skip passed the last one.
+    private func announceStep() {
+        guard let engine else { return }
+        switch engine.phase {
+        case .finished(.complete): audio.finished()
+        case .running, .paused: if let step = engine.currentStep { audio.stepStarted(step) }
+        default: break
+        }
+    }
+
+    private func announce(_ transition: Transition) {
+        switch transition {
+        case .stepStarted: if let step = engine?.currentStep { audio.stepStarted(step) }
+        case .finished: audio.finished()
         }
     }
 

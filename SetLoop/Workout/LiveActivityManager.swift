@@ -10,11 +10,12 @@ final class LiveActivityManager {
 
     init() {
         // Activities outlive the app: a killed or reinstalled app leaves its last one on the lock screen.
-        Self.endAll()
+        Self.endExisting()
     }
 
     func start(timerName: String, state: WorkoutActivityAttributes.ContentState?) {
-        Self.endAll()
+        // Before the request: the new activity must not be in the list that gets ended.
+        Self.endExisting()
         guard let state, ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         activityID = try? Activity.request(
             attributes: WorkoutActivityAttributes(timerName: timerName),
@@ -34,10 +35,14 @@ final class LiveActivityManager {
         Task.detached { await Self.activity(activityID)?.end(nil, dismissalPolicy: .immediate) }
     }
 
-    private nonisolated static func endAll() {
+    /// Ends the activities that exist right now. The IDs are taken synchronously, so an activity
+    /// requested after this call survives even if the ending task runs later.
+    private nonisolated static func endExisting() {
+        let ids = Activity<WorkoutActivityAttributes>.activities.map(\.id)
+        guard !ids.isEmpty else { return }
         Task.detached {
-            for activity in Activity<WorkoutActivityAttributes>.activities {
-                await activity.end(nil, dismissalPolicy: .immediate)
+            for id in ids {
+                await activity(id)?.end(nil, dismissalPolicy: .immediate)
             }
         }
     }

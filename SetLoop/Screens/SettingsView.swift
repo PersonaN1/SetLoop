@@ -1,8 +1,10 @@
+import SetLoopCore
 import SwiftUI
 
 /// Groups: Workout / Sound and haptics / Appearance / About (SPEC D22, DESIGN V8).
 struct SettingsView: View {
     @Environment(AppSettings.self) private var settings
+    @Environment(WorkoutController.self) private var workout
 
     var body: some View {
         @Bindable var settings = settings
@@ -21,10 +23,28 @@ struct SettingsView: View {
                     }
                 }
 
-                Section("Sound and Haptics") {
-                    Toggle("Vibration", isOn: $settings.vibration)
+                Section {
+                    Picker("Sounds", selection: $settings.soundSet) {
+                        Text("Off").tag(SoundSet?.none)
+                        ForEach(SoundSet.allCases, id: \.self) { set in
+                            Text(set.title).tag(SoundSet?.some(set))
+                        }
+                    }
+                    .onChange(of: settings.soundSet) { _, set in
+                        if let set { workout.previewSound(set) }
+                    }
                     Toggle("Voice Prompts", isOn: $settings.voicePrompts)
+                    Toggle("Vibration", isOn: $settings.vibration)
                     Toggle("Ignore Silent Mode", isOn: $settings.ignoreSilentMode)
+                } header: {
+                    Text("Sound and Haptics")
+                } footer: {
+                    // TECH T2: without audio iOS freezes the app on the lock screen.
+                    if settings.soundSet == nil && !settings.voicePrompts {
+                        Text("Without sounds or voice, steps on the Lock Screen change only when you open the app.")
+                    } else if !settings.ignoreSilentMode {
+                        Text("Signals follow the Silent switch and stop when the screen locks.")
+                    }
                 }
 
                 Section("Appearance") {
@@ -51,6 +71,16 @@ struct SettingsView: View {
 enum SupportLinks {
     static let privacy = URL(string: "https://personan1.github.io/SetLoop/privacy/")!
     static let support = URL(string: "https://personan1.github.io/SetLoop/support/")!
+}
+
+extension SoundSet {
+    var title: String {
+        switch self {
+        case .glass: String(localized: "Glass")
+        case .marimba: String(localized: "Marimba")
+        case .note: String(localized: "Note")
+        }
+    }
 }
 
 extension AppSettings.Theme {
