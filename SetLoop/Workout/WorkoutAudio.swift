@@ -25,6 +25,8 @@ final class WorkoutAudio {
     private var observers: [NSObjectProtocol] = []
 
     private var isActive = false
+    /// The workout is paused: the engine and session are released until it resumes.
+    private var isPaused = false
     private var isDucked = false
     private var unduckTask: Task<Void, Never>?
     private var endTask: Task<Void, Never>?
@@ -55,11 +57,24 @@ final class WorkoutAudio {
         unduckTask?.cancel()
         guard isActive else { return }
         isActive = false
-        isDucked = false
+        isPaused = false
         speech.stopSpeaking(at: .immediate)
-        players.forEach { $0.stop() }
-        engine.stop()
-        try? session.setActive(false, options: .notifyOthersOnDeactivation)
+        release()
+    }
+
+    /// Nothing plays during a pause, so no silence is rendered either (TECH T2).
+    func pause() {
+        guard isActive, !isPaused else { return }
+        isPaused = true
+        speech.stopSpeaking(at: .immediate)
+        release()
+    }
+
+    /// The session is mixable, so it can be activated again from the Live Activity in the background.
+    func resume() {
+        guard isActive, isPaused else { return }
+        isPaused = false
+        configure(ducked: false)
     }
 
     /// "3-2-1": spoken when the voice is on, otherwise a tick.
@@ -109,7 +124,7 @@ final class WorkoutAudio {
 
     /// The app is back in front: restart audio if an interruption ended without notice.
     func resumeIfNeeded() {
-        guard isActive, !engine.isRunning || isDucked else { return }
+        guard isActive, !isPaused, !engine.isRunning || isDucked else { return }
         configure(ducked: false)
     }
 
@@ -120,6 +135,7 @@ final class WorkoutAudio {
     private func play(_ cue: SoundCue, set: SoundSet? = nil) -> TimeInterval {
         guard isActive, let set = set ?? settings.soundSet else { return 0 }
         duck()
+        guard engine.isRunning else { return 0 }
         let buffer = buffer(cue, set)
         let player = cue == .countdown ? tickPlayer : stepPlayer
         player.scheduleBuffer(buffer, at: nil, options: .interrupts)
@@ -187,12 +203,23 @@ final class WorkoutAudio {
             while self?.speech.isSpeaking == true, !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(300))
             }
-            guard !Task.isCancelled, let self, self.isDucked else { return }
+            guard !Task.isCancelled, let self else { return }
+            // A signal on Skip or Back during a pause woke the audio; it goes back to sleep.
+            if self.isPaused { return self.release() }
+            guard self.isDucked else { return }
             // Restarting the session in the background lets iOS suspend the app mid-workout,
             // so the music stays ducked until the app is back in front or the workout ends.
             guard UIApplication.shared.applicationState == .active else { return }
             self.configure(ducked: false)
         }
+    }
+
+    private func release() {
+        unduckTask?.cancel()
+        isDucked = false
+        players.forEach { $0.stop() }
+        engine.stop()
+        try? session.setActive(false, options: .notifyOthersOnDeactivation)
     }
 
     /// Ducking is applied on activation, so the session is restarted to switch it.
@@ -246,8 +273,8 @@ final class WorkoutAudio {
             if reason == .appWasSuspended { return }
             onInterruptionBegan?()
         case .ended:
-            // The workout stays paused (SPEC D6); only the audio comes back.
-            configure(ducked: false)
+            // The workout stays paused (SPEC D6); the audio comes back on resume.
+            if !isPaused { configure(ducked: false) }
         @unknown default:
             break
         }

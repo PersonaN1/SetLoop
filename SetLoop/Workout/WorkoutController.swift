@@ -71,8 +71,16 @@ final class WorkoutController {
         scheduleNextCue()
     }
 
-    func pause() { mutate { $0.pause(at: $1) } }
-    func resume() { mutate { $0.resume(at: $1) } }
+    func pause() {
+        mutate { $0.pause(at: $1) }
+        if engine?.phase == .paused { audio.pause() }
+    }
+
+    func resume() {
+        mutate { $0.resume(at: $1) }
+        if engine?.phase == .running { audio.resume() }
+    }
+
     func togglePause() { engine?.phase == .paused ? resume() : pause() }
     func skip() { mutate { $0.skip(at: $1) }; announceStep() }
     func back() { mutate { $0.back(at: $1) }; announceStep() }
