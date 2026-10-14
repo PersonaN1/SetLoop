@@ -29,7 +29,10 @@ struct WorkoutView: View {
                 Color.clear.frame(maxHeight: .infinity)
                 if let step {
                     VStack(spacing: 16) {
-                        Text(step.step.name).font(.title.weight(.semibold))
+                        Text(step.step.name)
+                            .font(.largeTitle.weight(.bold))
+                            .multilineTextAlignment(.center)
+                            .padding(.bottom, 16)
                         Text(WorkoutFormat.time(engine.stepRemaining(at: now)))
                             .font(.system(size: 120, weight: .bold, design: .rounded))
                             .monospacedDigit()
