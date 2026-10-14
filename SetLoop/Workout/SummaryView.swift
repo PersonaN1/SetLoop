@@ -11,6 +11,8 @@ struct SummaryView: View {
     @State private var name = ""
     @State private var note = ""
     @State private var savedCount = 0
+    /// A double tap must not insert the record twice.
+    @State private var isSaved = false
 
     private var historyFull: Bool { savedCount >= Limits.maxHistoryRecords }
 
@@ -87,6 +89,7 @@ struct SummaryView: View {
                 Text("Save").font(.headline).frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(.borderedProminent)
+            .disabled(isSaved)
             Button("Don't Save", role: .destructive) { workout.close() }
                 .frame(minHeight: 44)
         }
@@ -95,6 +98,8 @@ struct SummaryView: View {
     }
 
     private func save() {
+        guard !isSaved else { return }
+        isSaved = true
         if historyFull { removeOldest(savedCount - Limits.maxHistoryRecords + 1) }
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         context.insert(WorkoutRecord(
