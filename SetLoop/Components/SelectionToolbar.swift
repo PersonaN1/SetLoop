@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 /// iOS-style bulk delete for a list: Select / Done, Select All, Delete (N) with confirmation.
-/// Swipe-to-delete on a row can reuse the same confirmation by setting `pendingDelete`.
+/// Swipe-to-delete on a row asks through `pendingDelete`; the toolbar button has its own dialog.
 struct SelectionToolbar: ViewModifier {
     @Binding var editMode: EditMode
     @Binding var selection: Set<PersistentIdentifier>
@@ -11,6 +11,8 @@ struct SelectionToolbar: ViewModifier {
     let allIDs: [PersistentIdentifier]
     let confirmationTitle: (Int) -> Text
     let delete: (Set<PersistentIdentifier>) -> Void
+
+    @State private var confirmingSelection = false
 
     func body(content: Content) -> some View {
         content
@@ -28,11 +30,16 @@ struct SelectionToolbar: ViewModifier {
                     }
                     ToolbarItem(placement: .bottomBar) {
                         Button(role: .destructive) {
-                            pendingDelete = selection
+                            confirmingSelection = true
                         } label: {
                             Text("Delete (\(selection.count))")
                         }
                         .disabled(selection.isEmpty)
+                        // Its own dialog, so the iOS 26+ popover points at this button.
+                        .confirmationDialog(confirmationTitle(selection.count), isPresented: $confirmingSelection,
+                                            titleVisibility: .visible) {
+                            Button("Delete", role: .destructive) { confirmDelete(selection) }
+                        }
                     }
                 }
             }
@@ -42,15 +49,17 @@ struct SelectionToolbar: ViewModifier {
                 titleVisibility: .visible,
                 presenting: pendingDelete
             ) { ids in
-                Button("Delete", role: .destructive) {
-                    delete(ids)
-                    selection.subtract(ids)
-                    if allIDs.count == ids.count { setEditing(false) }
-                }
+                Button("Delete", role: .destructive) { confirmDelete(ids) }
             }
             .onChange(of: allIDs) { selection.formIntersection($1) }
             // Set last so the list and everything around it share one edit mode.
             .environment(\.editMode, $editMode)
+    }
+
+    private func confirmDelete(_ ids: Set<PersistentIdentifier>) {
+        delete(ids)
+        selection.subtract(ids)
+        if allIDs.count == ids.count { setEditing(false) }
     }
 
     private func setEditing(_ editing: Bool) {

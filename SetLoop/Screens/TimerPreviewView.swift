@@ -69,18 +69,19 @@ struct TimerPreviewView: View {
                     }
                     Button("Delete", systemImage: "trash", role: .destructive) { confirmingDelete = true }
                 }
+                // On the menu button: the menu itself is gone by the time the dialog shows.
+                .confirmationDialog("Delete this timer?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+                    Button("Delete", role: .destructive) {
+                        context.delete(timer)
+                        try? context.save()
+                        dismiss()
+                    }
+                } message: {
+                    Text("Workouts in History stay.")
+                }
             }
         }
         .sheet(isPresented: $isEditing) { TimerEditorView(timer: timer) }
-        .confirmationDialog("Delete this timer?", isPresented: $confirmingDelete, titleVisibility: .visible) {
-            Button("Delete", role: .destructive) {
-                context.delete(timer)
-                try? context.save()
-                dismiss()
-            }
-        } message: {
-            Text("Workouts in History stay.")
-        }
         .timerLimitAlert(isPresented: $limitReached)
     }
 

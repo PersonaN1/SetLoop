@@ -49,18 +49,19 @@ struct RecordDetailView: View {
                 Button("Repeat", systemImage: "arrow.clockwise") { repeatWorkout() }
                     .disabled(record.definition == nil || workout.isPresented)
                 Button("Delete Workout", systemImage: "trash", role: .destructive) { confirmingDelete = true }
+                    // Attached to the button so the iOS 26+ popover points at it.
+                    .confirmationDialog("Delete this workout?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+                        Button("Delete", role: .destructive) {
+                            context.delete(record)
+                            try? context.save()
+                            dismiss()
+                        }
+                    }
             }
         }
         .scrollDismissesKeyboard(.immediately)
         .navigationTitle(record.name)
         .navigationBarTitleDisplayMode(.inline)
-        .confirmationDialog("Delete this workout?", isPresented: $confirmingDelete, titleVisibility: .visible) {
-            Button("Delete", role: .destructive) {
-                context.delete(record)
-                try? context.save()
-                dismiss()
-            }
-        }
     }
 
     private func repeatWorkout() {
