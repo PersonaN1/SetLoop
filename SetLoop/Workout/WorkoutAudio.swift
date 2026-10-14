@@ -147,7 +147,7 @@ final class WorkoutAudio {
         guard isActive, settings.voicePrompts, !text.isEmpty else { return }
         duck()
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = Self.voice
+        utterance.voice = voice
         utterance.preUtteranceDelay = delay
         speech.stopSpeaking(at: .immediate)
         speech.speak(utterance)
@@ -171,13 +171,14 @@ final class WorkoutAudio {
         return buffer
     }
 
-    /// The voice speaks the interface language (SPEC D12).
-    private static var voice: AVSpeechSynthesisVoice? {
+    /// The voice speaks the interface language (SPEC D12); looked up once.
+    private lazy var voice: AVSpeechSynthesisVoice? = {
         let language = Bundle.main.preferredLocalizations.first ?? "en"
+        // The full code keeps the user's region ("en-GB"), when it is the same language.
         let current = AVSpeechSynthesisVoice.currentLanguageCode()
-        if current.hasPrefix(language) { return AVSpeechSynthesisVoice(language: current) }
-        return AVSpeechSynthesisVoice.speechVoices().first { $0.language.hasPrefix(language) }
-    }
+        if current.hasPrefix(language), let voice = AVSpeechSynthesisVoice(language: current) { return voice }
+        return AVSpeechSynthesisVoice(language: language)
+    }()
 
     // MARK: - Session
 
