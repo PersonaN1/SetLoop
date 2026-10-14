@@ -26,6 +26,12 @@ final class WorkoutController {
         origin = clock.now
         audio = WorkoutAudio(settings: settings)
         audio.onInterruptionBegan = { [weak self] in self?.interrupted() }
+        WorkoutCommands.handler = { [weak self] command in
+            switch command {
+            case .togglePause: self?.togglePause()
+            case .skip: self?.skip()
+            }
+        }
     }
 
     var isPresented: Bool { engine != nil }

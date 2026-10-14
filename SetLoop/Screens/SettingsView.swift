@@ -78,7 +78,7 @@ extension SoundSet {
         switch self {
         case .glass: String(localized: "Glass")
         case .marimba: String(localized: "Marimba")
-        case .note: String(localized: "Note")
+        case .note: String(localized: "sound.note", defaultValue: "Note")
         }
     }
 }

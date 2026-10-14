@@ -77,6 +77,15 @@
 			path = SetLoop;
 			sourceTree = "<group>";
 		};
+		2C89E91B659277911B842C05 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			explicitFileTypes = {
+			};
+			explicitFolders = (
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		A828578AA326BFA7E2CC424A /* SetLoopWidgets */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -145,6 +154,7 @@
 				96B468EA815C7986D28522F4 /* Packages */,
 				1A11604AFECA2D3B86F8FB63 /* SetLoop */,
 				A828578AA326BFA7E2CC424A /* SetLoopWidgets */,
+				2C89E91B659277911B842C05 /* Shared */,
 				5AB54AC5B7E1B6F2E30DA2F9 /* Frameworks */,
 				F24B76C09A861DBDE5D6489A /* Products */,
 			);
@@ -176,6 +186,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				A828578AA326BFA7E2CC424A /* SetLoopWidgets */,
+				2C89E91B659277911B842C05 /* Shared */,
 			);
 			name = SetLoopWidgets;
 			packageProductDependencies = (
@@ -201,6 +212,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				1A11604AFECA2D3B86F8FB63 /* SetLoop */,
+				2C89E91B659277911B842C05 /* Shared */,
 			);
 			name = SetLoop;
 			packageProductDependencies = (
