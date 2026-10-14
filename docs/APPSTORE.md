@@ -1,6 +1,6 @@
 # App Store: страница приложения
 
-Тексты для App Store Connect на двух языках (SPEC D12, D19). Лимиты Apple указаны в скобках; длина проверена.
+Тексты для App Store Connect на двух языках (SPEC D12, D19). Лимиты Apple: название и подзаголовок — 30 символов, промотекст — 170, ключевые слова — 100 байт (кириллица — 2 байта на букву, через запятую без пробелов, без слов из названия и подзаголовка), описание — 4000. Все тексты в лимитах.
 
 ## Общее
 
@@ -18,93 +18,85 @@
 
 ## Русский
 
-**Название** (30): SetLoop
+**Название:** SetLoop
 
-**Подзаголовок** (30): Интервальный таймер для HIIT
+**Подзаголовок:** Интервальный таймер тренировок
 
-**Промотекст** (170, можно менять без ревью):
+**Промотекст** (можно менять без ревью):
 
 Соберите таймер для тренировки любой сложности: блоки, сеты, любые сочетания. Звуки, голос и таймер на экране блокировки. Бесплатно и без рекламы.
 
-**Ключевые слова** (100 байт: кириллица — 2 байта на букву; через запятую без пробелов; слова из названия и подзаголовка не повторяем):
+**Ключевые слова:**
 
-табата,кроссфит,emom,бокс,раунды,сеты,отдых,зал,фитнес
+табата,кроссфит,emom,бокс,раунды,сеты,отдых,hiit,фитнес
 
-**Описание** (4000):
+**Описание:**
 
-SetLoop — интервальный таймер для тренировки любой сложности: блоки, сеты, любые сочетания. Вся структура видна сразу на цветной полосе.
+SetLoop — интервальный таймер для тренировки любой сложности. Соберите её из блоков и сетов — вся структура видна сразу на цветной полосе.
 
-ТАЙМЕР ПОД ВАШУ ТРЕНИРОВКУ
-• Шаги разных типов: подготовка, три вида работы, отдых, заминка — у каждого свой цвет.
-• Блоки со своими повторами: например, 20 секунд работы и 10 отдыха ×8.
+ВОЗМОЖНОСТИ
+• Шаги: подготовка, работа, отдых, заминка — у каждого свой цвет.
+• Блоки с повторами, например 20 секунд работы и 10 отдыха ×8.
 • Сеты с отдыхом между ними.
-• Готовые таймеры для старта: табата, простой интервал и пример посложнее.
-• До старта видно общее время, сколько работы и сколько отдыха.
+• Готовые таймеры: табата и другие.
+• До старта видно общее время, работу и отдых.
 
 ВО ВРЕМЯ ТРЕНИРОВКИ
-• Крупный отсчёт, который видно издалека, и цвет экрана по типу шага.
-• Звуки, голосовые подсказки и вибрация перед сменой шага.
-• Таймер на экране блокировки и в Dynamic Island с кнопками паузы и пропуска.
-• Пауза при звонке и экран, который не гаснет, — по желанию.
-
-ИСТОРИЯ
-• Каждая завершённая тренировка сохраняется: когда, сколько и что именно.
+• Крупный отсчёт, видно издалека.
+• Звуки, голос и вибрация перед сменой шага.
+• Таймер на экране блокировки и в Dynamic Island, с паузой и пропуском.
+• История всех тренировок.
 
 НАСТРОЙКИ
-• Наборы звуков или тишина, голосовые подсказки, вибрация.
-• Сигналы даже в беззвучном режиме — по желанию.
-• Свои цвета шагов, светлая и тёмная тема.
-• Русский и английский язык.
+• Звуки, голос, вибрация.
+• Сигналы в беззвучном режиме.
+• Пауза при звонке, экран не гаснет.
+• Цвета шагов, светлая и тёмная тема.
 
-ЧЕСТНО
-SetLoop бесплатный, без рекламы, без регистрации и без сбора данных. Таймеры и история хранятся только на вашем iPhone.
+Бесплатно, без рекламы и регистрации. Данные хранятся только на вашем iPhone.
 
-Вопросы и идеи — в Telegram: t.me/setnewloop
+Вопросы и идеи: t.me/setnewloop
 
 ## English
 
-**Name** (30): SetLoop
+**Name:** SetLoop
 
-**Subtitle** (30): HIIT & Tabata Interval Timer
+**Subtitle:** Interval Workout Timer
 
-**Promotional text** (170):
+**Promotional text:**
 
 Build a timer for any workout: blocks, sets, any combination. Sounds, voice and a timer on the Lock Screen. Free, no ads.
 
-**Keywords** (100 bytes):
+**Keywords:**
 
-workout,training,crossfit,emom,circuit,round,boxing,rest,stopwatch,sets,reps,gym,fitness,exercise
+hiit,tabata,crossfit,emom,circuit,round,boxing,rest,sets,reps,gym,fitness,exercise,training
 
-**Description** (4000):
+**Description:**
 
-SetLoop is an interval timer for any workout: blocks, sets, any combination. The whole structure is visible at a glance as one colored strip.
+SetLoop is an interval timer for any workout. Build it from blocks and sets — the whole structure is visible at a glance as one colored strip.
 
-A TIMER THAT FITS YOUR WORKOUT
-• Steps of different types: prepare, three kinds of work, rest, cooldown — each with its own color.
-• Blocks with their own repeats: for example, 20 seconds of work and 10 of rest ×8.
+FEATURES
+• Steps: prepare, work, rest, cooldown — each with its own color.
+• Blocks with repeats, e.g. 20 seconds of work and 10 of rest ×8.
 • Sets with rest between them.
-• Ready-made timers to start from: Tabata, a simple interval and a more advanced example.
-• Before you start, see the total time and how much of it is work and rest.
+• Ready-made timers: Tabata and more.
+• Total time, work and rest shown before you start.
 
 DURING THE WORKOUT
-• A large countdown you can read from across the room, with the screen colored by step type.
-• Sounds, voice prompts and vibration before each step change.
-• The timer on the Lock Screen and in the Dynamic Island, with pause and skip buttons.
-• Optional pause on calls and keeping the screen on.
-
-HISTORY
-• Every finished workout is saved: when, how long and what exactly.
+• Large countdown, readable from afar.
+• Sounds, voice and vibration before each step change.
+• Timer on the Lock Screen and in the Dynamic Island, with pause and skip.
+• History of every workout.
 
 SETTINGS
-• Sound sets or silence, voice prompts, vibration.
-• Signals even in Silent mode — if you want.
-• Custom step colors, light and dark theme.
-• English and Russian.
+• Sounds, voice, vibration.
+• Signals in Silent mode.
+• Pause on calls, keep the screen on.
+• Step colors, light and dark theme.
 
-NO STRINGS ATTACHED
-SetLoop is free, with no ads, no sign-up and no data collection. Your timers and history stay on your iPhone.
+Free, no ads, no sign-up. Your data stays on your iPhone.
 
-Questions and ideas — Telegram: t.me/setnewloop
+Questions and ideas: t.me/setnewloop
 
 ## Notes for App Review
 
