@@ -1,0 +1,78 @@
+name: SetLoop
+options:
+  bundleIdPrefix: io.github.personan1
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+    LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+    SWIFT_EMIT_LOC_STRINGS: YES
+packages:
+  SetLoopCore:
+    path: Packages/SetLoopCore
+targets:
+  SetLoop:
+    type: application
+    platform: iOS
+    sources:
+      - path: SetLoop
+        type: syncedFolder
+    dependencies:
+      - package: SetLoopCore
+      - target: SetLoopWidgets
+    info:
+      path: SetLoop/Info.plist
+      properties:
+        CFBundleDisplayName: SetLoop
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en, ru]
+        UILaunchScreen: {}
+        UIBackgroundModes: [audio]
+        NSSupportsLiveActivities: true
+        ITSAppUsesNonExemptEncryption: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.personan1.setloop
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+  SetLoopWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: SetLoopWidgets
+        type: syncedFolder
+    dependencies:
+      - package: SetLoopCore
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+    info:
+      path: SetLoopWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: SetLoop
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.personan1.setloop.widgets
+schemes:
+  SetLoop:
+    build:
+      targets:
+        SetLoop: all
+    run:
+      config: Debug
+    archive:
+      config: Release
