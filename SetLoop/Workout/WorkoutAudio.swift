@@ -252,8 +252,7 @@ final class WorkoutAudio {
         observers.append(center.addObserver(forName: AVAudioSession.interruptionNotification, object: session, queue: .main) { [weak self] note in
             let info = note.userInfo
             let type = (info?[AVAudioSessionInterruptionTypeKey] as? UInt).flatMap(AVAudioSession.InterruptionType.init)
-            let reason = (info?[AVAudioSessionInterruptionReasonKey] as? UInt).flatMap(AVAudioSession.InterruptionReason.init)
-            MainActor.assumeIsolated { self?.handleInterruption(type, reason: reason) }
+            MainActor.assumeIsolated { self?.handleInterruption(type) }
         })
         // Headphones and other route changes stop the engine.
         observers.append(center.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main) { [weak self] _ in
@@ -264,13 +263,11 @@ final class WorkoutAudio {
         })
     }
 
-    private func handleInterruption(_ type: AVAudioSession.InterruptionType?, reason: AVAudioSession.InterruptionReason?) {
+    private func handleInterruption(_ type: AVAudioSession.InterruptionType?) {
         guard isActive, let type else { return }
         switch type {
         case .began:
             isDucked = false
-            // Delivered late after the app was frozen: nothing actually interrupted the workout.
-            if reason == .appWasSuspended { return }
             onInterruptionBegan?()
         case .ended:
             // The workout stays paused (SPEC D6); the audio comes back on resume.
