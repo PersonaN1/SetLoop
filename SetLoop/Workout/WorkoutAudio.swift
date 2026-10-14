@@ -1,5 +1,6 @@
 import AVFoundation
 import AudioToolbox
+import UIKit
 import SetLoopCore
 
 /// Signals, voice and vibration of a workout, and audio interruptions such as calls (SPEC D5, D6; TECH T2, T6).
@@ -108,7 +109,7 @@ final class WorkoutAudio {
 
     /// The app is back in front: restart audio if an interruption ended without notice.
     func resumeIfNeeded() {
-        guard isActive, !engine.isRunning else { return }
+        guard isActive, !engine.isRunning || isDucked else { return }
         configure(ducked: false)
     }
 
@@ -182,6 +183,9 @@ final class WorkoutAudio {
                 try? await Task.sleep(for: .milliseconds(300))
             }
             guard !Task.isCancelled, let self, self.isDucked else { return }
+            // Restarting the session in the background lets iOS suspend the app mid-workout,
+            // so the music stays ducked until the app is back in front or the workout ends.
+            guard UIApplication.shared.applicationState == .active else { return }
             self.configure(ducked: false)
         }
     }

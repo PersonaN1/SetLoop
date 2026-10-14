@@ -124,12 +124,13 @@ final class WorkoutController {
         if case .countdown(let left) = cue.kind, onTime { audio.countdown(left) }
         let transitions = engine.update(at: now)
         self.engine = engine
-        if onTime, let last = transitions.last { announce(last) }
         if transitions.isEmpty {
             scheduleNextCue()
         } else {
+            // The Lock Screen first: audio work must not hold it back.
             didChangeState()
         }
+        if onTime, let last = transitions.last { announce(last) }
     }
 
     /// Pause on a call, Siri or alarm; no automatic resume (SPEC D6).
