@@ -40,6 +40,10 @@ News and questions — Telegram [@setnewloop](https://t.me/setnewloop). Bug repo
 - [Design](docs/DESIGN.md)
 - [Technical design](docs/TECH.md)
 
+## Support the project
+
+SetLoop is free and has no ads. If you like it, you can [buy the developer a coffee](https://pay.cloudtips.ru/p/7fee0c9b) ☕
+
 ## License
 
 Copyright © 2026. All rights reserved. The source code is published for reference only; no license is granted to copy, modify or distribute it.
