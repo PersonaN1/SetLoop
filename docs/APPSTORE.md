@@ -102,9 +102,17 @@ Questions and ideas: t.me/setnewloop
 
 English, в поле App Review Information → Notes:
 
-> SetLoop needs no account or sign-in. To try it, tap the play button next to any of the example timers.
-> The audio background mode is used to play step sounds and voice prompts while the screen is locked during a workout; without it the cues stop when the phone locks. Audio stops when the workout ends.
-> Live Activity shows the current step on the Lock Screen and in the Dynamic Island; its pause and skip buttons control the running workout.
+> SetLoop needs no account, sign-in or network access. All data stays on the device.
+>
+> How to test:
+> 1. Tap the play button next to "Tabata 20/10" (an example timer). The workout screen opens and the step sounds start.
+> 2. Lock the phone. The current step and a countdown appear on the Lock Screen (Live Activity) and in the Dynamic Island. The step sounds keep playing while locked.
+> 3. On the Lock Screen, tap Pause, then Resume, then Skip: the workout follows. Unlock to see the same state in the app.
+> 4. Tap Finish to see the summary and save the workout to History.
+> 5. Siri / Shortcuts: say "Start Tabata 20/10 in SetLoop", or use the "Start Timer" action in the Shortcuts app. "Pause SetLoop" and "Resume SetLoop" control a running workout.
+>
+> Background audio: the audio background mode plays step sounds and voice prompts while the screen is locked during a workout; without it the cues stop when the phone locks. The audio session is active only during a workout and ends when it finishes. Music from other apps keeps playing and is only lowered briefly around each cue.
+> If a call, Siri or an alarm interrupts the workout, it pauses (can be turned off in Settings).
 
 ## Скриншоты
 

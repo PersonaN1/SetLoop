@@ -34,10 +34,10 @@ struct TimerPreviewView: View {
                         .monospacedDigit()
                         .accessibilityLabel(WorkoutFormat.longDuration(definition.totalDuration))
                     TimerStrip(definition: definition, colors: workout.colors, height: 12)
-                    HStack {
-                        Metric(title: "Work", value: WorkoutFormat.duration(definition.duration(of: .work)))
-                        Metric(title: "Rest", value: WorkoutFormat.duration(definition.duration(of: .rest)))
-                        Metric(title: "Other", value: WorkoutFormat.duration(definition.duration(of: .other)))
+                    MetricRow {
+                        Metric(title: "Work", duration: definition.duration(of: .work))
+                        Metric(title: "Rest", duration: definition.duration(of: .rest))
+                        Metric(title: "Other", duration: definition.duration(of: .other))
                     }
                 }
                 .padding(.vertical, 6)
@@ -111,11 +111,10 @@ struct TimerPreviewView: View {
     }
 
     private func row(_ step: Step) -> some View {
-        HStack(spacing: 12) {
+        StepLine(name: step.name) {
             TypeDot(color: workout.colors[step.type].color)
-            Text(step.name)
-            Spacer()
-            Text(WorkoutFormat.duration(step.duration)).foregroundStyle(.secondary).monospacedDigit()
+        } detail: {
+            StepDuration(seconds: step.duration)
         }
         .accessibilityElement(children: .combine)
     }

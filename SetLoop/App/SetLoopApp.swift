@@ -4,14 +4,8 @@ import SwiftUI
 
 @main
 struct SetLoopApp: App {
-    @State private var settings: AppSettings
-    @State private var workout: WorkoutController
-
-    init() {
-        let settings = AppSettings()
-        _settings = State(initialValue: settings)
-        _workout = State(initialValue: WorkoutController(settings: settings))
-    }
+    @State private var settings = AppModel.settings
+    @State private var workout = AppModel.workout
 
     var body: some Scene {
         WindowGroup {
@@ -20,11 +14,18 @@ struct SetLoopApp: App {
                 .environment(workout)
                 .preferredColorScheme(settings.theme.colorScheme)
         }
-        .modelContainer(Self.container)
+        .modelContainer(AppModel.container)
     }
+}
 
-    /// Created once: SwiftUI may build the App more than once.
-    private static let container: ModelContainer = {
+/// App-wide objects, created once: SwiftUI may build the App more than once, and an App Intent
+/// may run before the App is built at all.
+@MainActor
+enum AppModel {
+    static let settings = AppSettings()
+    static let workout = WorkoutController(settings: settings)
+
+    static let container: ModelContainer = {
         let container: ModelContainer
         do {
             container = try ModelContainer(for: Schema(versionedSchema: SchemaV1.self),

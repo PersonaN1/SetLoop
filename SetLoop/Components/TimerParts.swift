@@ -47,6 +47,44 @@ struct TypeDot: View {
     }
 }
 
+/// A step name with its color mark and time. At accessibility text sizes the time goes under the name,
+/// so the name is not broken mid-word.
+struct StepLine<Mark: View, Detail: View>: View {
+    let name: String
+    @ViewBuilder let mark: Mark
+    @ViewBuilder let detail: Detail
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    var body: some View {
+        HStack(spacing: 12) {
+            mark
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(name)
+                    HStack { detail }
+                }
+                Spacer(minLength: 0)
+            } else {
+                Text(name)
+                Spacer()
+                detail
+            }
+        }
+    }
+}
+
+/// A step length in the list, read out in words by VoiceOver.
+struct StepDuration: View {
+    let seconds: Int
+
+    var body: some View {
+        Text(WorkoutFormat.duration(seconds))
+            .foregroundStyle(.secondary)
+            .monospacedDigit()
+            .accessibilityLabel(WorkoutFormat.spokenDuration(seconds))
+    }
+}
+
 /// Timer structure strip with the detail level picked by DESIGN V4.
 struct TimerStrip: View {
     let definition: TimerDefinition

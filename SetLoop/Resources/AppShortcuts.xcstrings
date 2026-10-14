@@ -1,0 +1,92 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Pause ${applicationName}": {
+      "localizations": {
+        "ru": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Пауза в ${applicationName}",
+              "Поставь ${applicationName} на паузу"
+            ]
+          }
+        }
+      }
+    },
+    "Pause the workout in ${applicationName}": {
+      "localizations": {
+        "ru": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Поставь тренировку на паузу в ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Resume ${applicationName}": {
+      "localizations": {
+        "ru": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Продолжи ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Resume the workout in ${applicationName}": {
+      "localizations": {
+        "ru": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Продолжи тренировку в ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Start ${applicationName}": {
+      "localizations": {
+        "ru": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Запусти ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Start ${timer} in ${applicationName}": {
+      "localizations": {
+        "ru": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Запусти ${timer} в ${applicationName}",
+              "Начни ${timer} в ${applicationName}"
+            ]
+          }
+        }
+      }
+    },
+    "Start a timer in ${applicationName}": {
+      "localizations": {
+        "ru": {
+          "stringSet": {
+            "state": "translated",
+            "values": [
+              "Запусти таймер в ${applicationName}"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

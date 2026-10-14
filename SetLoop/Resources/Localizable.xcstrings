@@ -11,6 +11,26 @@
         }
       }
     },
+    "%@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
+          }
+        }
+      }
+    },
+    "%@ of %@": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ из %2$@"
+          }
+        }
+      }
+    },
     "%@ · %@": {
       "localizations": {
         "en": {
@@ -85,6 +105,16 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "%lld of %lld": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld из %2$lld"
           }
         }
       }
@@ -199,6 +229,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "В таймере может быть до %lld блоков."
+          }
+        }
+      }
+    },
+    "A workout is already running.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тренировка уже идёт."
           }
         }
       }
@@ -899,6 +939,26 @@
         }
       }
     },
+    "No workout is paused.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нет тренировки на паузе."
+          }
+        }
+      }
+    },
+    "No workout is running.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сейчас нет идущей тренировки."
+          }
+        }
+      }
+    },
     "No workouts yet": {
       "localizations": {
         "ru": {
@@ -1009,6 +1069,16 @@
         }
       }
     },
+    "Pause Workout": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пауза тренировки"
+          }
+        }
+      }
+    },
     "Pause on Calls": {
       "localizations": {
         "ru": {
@@ -1025,6 +1095,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Пауза или продолжить"
+          }
+        }
+      }
+    },
+    "Pauses the running workout.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ставит идущую тренировку на паузу."
           }
         }
       }
@@ -1145,6 +1225,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Продолжить"
+          }
+        }
+      }
+    },
+    "Resume Workout": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжить тренировку"
+          }
+        }
+      }
+    },
+    "Resumes the paused workout.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продолжает тренировку после паузы."
           }
         }
       }
@@ -1355,12 +1455,42 @@
         }
       }
     },
+    "Start ${timer}": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запустить ${timer}"
+          }
+        }
+      }
+    },
     "Start %@": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Запустить %@"
+          }
+        }
+      }
+    },
+    "Start Timer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запустить таймер"
+          }
+        }
+      }
+    },
+    "Starts a workout with the chosen timer.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запускает тренировку с выбранным таймером."
           }
         }
       }
@@ -1485,6 +1615,16 @@
         }
       }
     },
+    "This timer no longer exists.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Этого таймера больше нет."
+          }
+        }
+      }
+    },
     "This week": {
       "localizations": {
         "ru": {
@@ -1501,6 +1641,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Время"
+          }
+        }
+      }
+    },
+    "Timer": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Таймер"
           }
         }
       }

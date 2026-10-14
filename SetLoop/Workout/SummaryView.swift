@@ -46,6 +46,8 @@ struct SummaryView: View {
             Image(systemName: summary.status == .complete ? "checkmark.circle.fill" : "flag.checkered.circle.fill")
                 .font(.system(size: 56))
                 .foregroundStyle(summary.status == .complete ? Color.green : Color.orange)
+                // The badge below says the same.
+                .accessibilityHidden(true)
             Text(WorkoutFormat.duration(summary.duration))
                 .font(.system(.largeTitle, design: .rounded, weight: .bold))
                 .monospacedDigit()
@@ -56,10 +58,11 @@ struct SummaryView: View {
     }
 
     private var metrics: some View {
-        HStack {
-            Metric(title: "Work", value: WorkoutFormat.duration(summary.time(of: .work)))
-            Metric(title: "Rest", value: WorkoutFormat.duration(summary.time(of: .rest)))
-            Metric(title: "Steps", value: "\(summary.completedSteps)/\(summary.totalSteps)")
+        MetricRow {
+            Metric(title: "Work", duration: summary.time(of: .work))
+            Metric(title: "Rest", duration: summary.time(of: .rest))
+            Metric(title: "Steps", value: "\(summary.completedSteps)/\(summary.totalSteps)",
+                   spokenValue: String(localized: "\(summary.completedSteps) of \(summary.totalSteps)"))
         }
     }
 

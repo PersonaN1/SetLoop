@@ -209,12 +209,13 @@ struct TimerEditorView: View {
 
     @ViewBuilder
     private func stepRow(_ step: Step, slot: StepSlot) -> some View {
-        let label = HStack(spacing: 12) {
+        let label = StepLine(name: step.name) {
             TypeDot(color: workout.colors[step.type].color)
-            Text(step.name).foregroundStyle(Color.primary)
-            Spacer()
-            Text(WorkoutFormat.duration(step.duration)).foregroundStyle(.secondary).monospacedDigit()
+        } detail: {
+            StepDuration(seconds: step.duration)
         }
+        .foregroundStyle(Color.primary)
+        .accessibilityElement(children: .combine)
         if editMode.isEditing {
             label
         } else {
