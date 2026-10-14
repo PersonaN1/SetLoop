@@ -85,7 +85,10 @@ public struct TimerDefinition: Codable, Hashable, Sendable {
 }
 
 public enum Limits {
-    public static let maxTimers = 30
+    /// The list shows no counter; a hint appears only when adding is refused (SPEC D9).
+    public static let maxTimers = 100
+    /// At the limit, saving a workout removes the oldest record (SPEC D10).
+    public static let maxHistoryRecords = 3000
     public static let maxBlocks = 10
     public static let maxStepsPerBlock = 30
     public static let stepDuration = 1...5999

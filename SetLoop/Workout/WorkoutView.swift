@@ -4,11 +4,16 @@ import SwiftUI
 /// Full-screen workout, filled with the step color (SPEC D4, DESIGN V1).
 struct WorkoutView: View {
     @Environment(WorkoutController.self) private var workout
+    @State private var confirmingFinish = false
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 0.25)) { _ in
-            if let engine = workout.engine {
-                content(engine)
+        if let summary = workout.summary {
+            SummaryView(summary: summary)
+        } else {
+            TimelineView(.periodic(from: .now, by: 0.25)) { _ in
+                if let engine = workout.engine {
+                    content(engine)
+                }
             }
         }
     }
@@ -21,20 +26,15 @@ struct WorkoutView: View {
             (step.map { workout.colors[$0.type].color } ?? Color.black)
                 .ignoresSafeArea()
             VStack(spacing: 16) {
-                if case .finished(let status) = engine.phase {
-                    Text(status == .complete ? "Completed" : "Finished early").font(.largeTitle.bold())
-                    Button("Done") { workout.close() }
-                        .buttonStyle(.borderedProminent)
-                } else if let step {
+                if let step {
                     Text(step.step.name).font(.title.weight(.semibold))
                     Text(WorkoutFormat.time(engine.stepRemaining(at: now)))
                         .font(.system(size: 120, weight: .bold, design: .rounded))
                         .monospacedDigit()
                         .minimumScaleFactor(0.5)
-                    Text(WorkoutFormat.position(step.position)).font(.headline)
-                    if let next = engine.nextStep {
-                        Text(WorkoutFormat.next(next)).font(.subheadline)
-                    }
+                    // Both lines keep their height when empty (a space), so the controls below never jump.
+                    Text(nonEmpty(WorkoutFormat.position(step.position))).font(.headline)
+                    Text(nonEmpty(engine.nextStep.map { WorkoutFormat.next($0) })).font(.subheadline)
                     controls(engine)
                 }
             }
@@ -56,14 +56,24 @@ struct WorkoutView: View {
                 Button { workout.skip() } label: { controlIcon("forward.end.fill") }
                     .accessibilityLabel("Skip")
             }
-            // TODO: confirmation dialog and summary screen (SPEC D3, D10).
-            Button("Finish") { workout.finish() }
+            Button("Finish") { confirmingFinish = true }
                 .font(.headline)
                 .frame(minHeight: 44)
                 .opacity(engine.phase == .paused ? 1 : 0)
                 .disabled(engine.phase != .paused)
         }
         .tint(.white)
+        // Finishing early needs confirmation and leads to the summary (SPEC D3).
+        .confirmationDialog("Finish the workout?", isPresented: $confirmingFinish, titleVisibility: .visible) {
+            Button("Finish", role: .destructive) { workout.finish() }
+        } message: {
+            Text("Remaining steps will not be recorded.")
+        }
+    }
+
+    private func nonEmpty(_ text: String?) -> String {
+        guard let text, !text.isEmpty else { return " " }
+        return text
     }
 
     private func controlIcon(_ name: String, size: CGFloat = 64) -> some View {

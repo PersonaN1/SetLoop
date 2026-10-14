@@ -8,6 +8,8 @@ import SetLoopCore
 final class WorkoutController {
     private(set) var engine: WorkoutEngine?
     private(set) var timerName = ""
+    /// Kept for the history record, so "Repeat" works after the timer is edited or deleted.
+    private(set) var definition = TimerDefinition(blocks: [])
     private(set) var startedAt = Date.now
     var colors = StepColors.default
 
@@ -22,6 +24,9 @@ final class WorkoutController {
 
     var isPresented: Bool { engine != nil }
 
+    /// Available once the workout has finished.
+    var summary: WorkoutSummary? { engine.flatMap { WorkoutSummary(engine: $0, at: now) } }
+
     /// Monotonic seconds used by the engine.
     var now: TimeInterval {
         let elapsed = clock.now - origin
@@ -31,12 +36,18 @@ final class WorkoutController {
     // MARK: - Commands
 
     func start(_ timer: SavedTimer) {
-        var engine = WorkoutEngine(plan: timer.definition.plan)
+        start(name: timer.name, definition: timer.definition)
+    }
+
+    func start(name: String, definition: TimerDefinition) {
+        guard engine == nil else { return }
+        var engine = WorkoutEngine(plan: definition.plan)
         engine.start(at: now)
         self.engine = engine
-        timerName = timer.name
+        self.definition = definition
+        timerName = name
         startedAt = .now
-        liveActivity.start(timerName: timer.name, state: activityState())
+        liveActivity.start(timerName: name, state: activityState())
         scheduleNextCue()
     }
 
