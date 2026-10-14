@@ -24,11 +24,13 @@ public enum SoundSynth {
     public static let sampleRate = 44_100.0
     /// Peak level of every sound, leaving headroom for the mixer.
     public static let peak: Float = 0.8
+    /// Everything three semitones below the lab page's default, picked by ear.
+    static let transpose = pow(2, -3.0 / 12)
 
     /// Mono samples at `sampleRate`, normalized to `peak`.
     public static func samples(_ cue: SoundCue, in set: SoundSet) -> [Float] {
         let (voice, notes) = set.score(cue)
-        return render(voice, notes)
+        return render(voice, notes.map { ($0.frequency * transpose, $0.start) })
     }
 
     static func render(_ voice: Voice, _ notes: [(frequency: Double, start: TimeInterval)]) -> [Float] {
