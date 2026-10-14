@@ -47,21 +47,32 @@ private struct LockScreenView: View {
     let timerName: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(state.stepName).font(.headline)
+        // The lock screen card is limited to ~160 pt: header, one row with texts and digits, progress bar.
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(state.stepName).font(.headline).lineLimit(1)
                 Spacer()
-                Text(timerName).font(.footnote).opacity(0.85)
+                Text(timerName).font(.footnote).opacity(0.85).lineLimit(1)
             }
-            CountdownText(state: state)
-                .font(.system(size: 52, weight: .bold, design: .rounded))
-            Text([state.positionText, state.nextText].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: "\n"))
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading, spacing: 2) {
+                    if !state.positionText.isEmpty { Text(state.positionText) }
+                    if let next = state.nextText { Text(next) }
+                }
                 .font(.footnote)
+                .lineLimit(1)
                 .opacity(0.9)
-            // TODO: Pause / Skip buttons via LiveActivityIntent (TECH T10).
+                Spacer(minLength: 8)
+                // TODO: Pause / Skip buttons via LiveActivityIntent (TECH T10).
+                CountdownText(state: state)
+                    .font(.system(size: 44, weight: .bold, design: .rounded))
+                    .lineLimit(1)
+                    .frame(maxWidth: 130, alignment: .trailing)
+            }
+            StepProgressBar(state: state)
         }
         .foregroundStyle(.white)
-        .padding()
+        .padding(16)
     }
 }
 
@@ -79,6 +90,18 @@ private struct CountdownText: View {
         }
         .monospacedDigit()
         .multilineTextAlignment(.trailing)
+    }
+}
+
+private struct StepProgressBar: View {
+    let state: WorkoutActivityAttributes.ContentState
+
+    var body: some View {
+        if let start = state.stepStart, let end = state.stepEnd {
+            ProgressView(timerInterval: start...end, countsDown: false) { EmptyView() } currentValueLabel: { EmptyView() }
+                .progressViewStyle(.linear)
+                .tint(.white)
+        }
     }
 }
 

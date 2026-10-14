@@ -23,6 +23,8 @@ struct TimerListView: View {
                     } label: {
                         Image(systemName: "play.fill")
                     }
+                    // Only the button starts; the row will open the preview (SPEC D9).
+                    .buttonStyle(.borderless)
                     .accessibilityLabel("Start \(timer.name)")
                 }
             }

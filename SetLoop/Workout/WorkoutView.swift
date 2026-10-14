@@ -44,21 +44,33 @@ struct WorkoutView: View {
     }
 
     private func controls(_ engine: WorkoutEngine) -> some View {
-        HStack(spacing: 32) {
-            Button { workout.back() } label: { Image(systemName: "backward.end.fill") }
-                .accessibilityLabel("Back")
-            Button { workout.togglePause() } label: {
-                Image(systemName: engine.phase == .paused ? "play.fill" : "pause.fill").font(.largeTitle)
+        VStack(spacing: 20) {
+            // The row never changes layout, so a button never moves under the finger.
+            HStack(spacing: 40) {
+                Button { workout.back() } label: { controlIcon("backward.end.fill") }
+                    .accessibilityLabel("Back")
+                Button { workout.togglePause() } label: {
+                    controlIcon(engine.phase == .paused ? "play.fill" : "pause.fill", size: 88)
+                }
+                .accessibilityLabel(engine.phase == .paused ? "Resume" : "Pause")
+                Button { workout.skip() } label: { controlIcon("forward.end.fill") }
+                    .accessibilityLabel("Skip")
             }
-            .accessibilityLabel(engine.phase == .paused ? "Resume" : "Pause")
-            Button { workout.skip() } label: { Image(systemName: "forward.end.fill") }
-                .accessibilityLabel("Skip")
-            if engine.phase == .paused {
-                // TODO: confirmation dialog and summary screen (SPEC D3, D10).
-                Button("Finish") { workout.finish() }
-            }
+            // TODO: confirmation dialog and summary screen (SPEC D3, D10).
+            Button("Finish") { workout.finish() }
+                .font(.headline)
+                .frame(minHeight: 44)
+                .opacity(engine.phase == .paused ? 1 : 0)
+                .disabled(engine.phase != .paused)
         }
-        .font(.title)
         .tint(.white)
+    }
+
+    private func controlIcon(_ name: String, size: CGFloat = 64) -> some View {
+        Image(systemName: name)
+            .font(.system(size: size * 0.4))
+            .frame(width: size, height: size)
+            .background(.white.opacity(0.18), in: Circle())
+            .contentShape(Circle())
     }
 }
