@@ -16,10 +16,12 @@ jobs:
           xcode-version: latest-stable
       - run: xcodebuild -version
       # project.yml is the source of truth; the tracked .xcodeproj must match it.
+      # Pinned to the local version: another one may write the project differently.
       - name: Check generated project
         run: |
-          brew install xcodegen
-          xcodegen generate
+          curl -sSL -o "$RUNNER_TEMP/xcodegen.zip" https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip
+          unzip -q "$RUNNER_TEMP/xcodegen.zip" -d "$RUNNER_TEMP"
+          "$RUNNER_TEMP/xcodegen/bin/xcodegen" generate
           git diff --exit-code
       - name: Core tests
         run: swift test --package-path Packages/SetLoopCore
