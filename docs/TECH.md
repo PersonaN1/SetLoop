@@ -67,7 +67,7 @@
 - Bundle ID приложения: `io.github.personan1.setloop`; расширение: `io.github.personan1.setloop.widgets`. Нижний регистр — Bundle ID чувствителен к регистру, единый стиль исключает путаницу.
 - App Group в v1 не нужен (Live Activity получает данные через `ActivityKit`); добавим `group.io.github.personan1.setloop` в v1.1 вместе с виджетом.
 - Страницы для App Store (D20): GitHub Pages из папки `site/` через GitHub Actions → `https://personan1.github.io/SetLoop/privacy/` и `/support/`.
-- Поддержка — GitHub Issues этого репозитория.
+- Поддержка — Telegram https://t.me/setnewloop, запасной канал — GitHub Issues этого репозитория.
 
 ### T8. Сборка и язык
 
