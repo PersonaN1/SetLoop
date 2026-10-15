@@ -14,7 +14,7 @@
 | Privacy Policy URL | https://personan1.github.io/SetLoop/privacy/ |
 | Support URL | https://personan1.github.io/SetLoop/support/ |
 | Marketing URL | https://personan1.github.io/SetLoop/ |
-| Copyright | 2026 Имя Фамилия (как в аккаунте разработчика) |
+| Copyright | 2026 Aleksandr Vasilev (написание — как в аккаунте разработчика) |
 
 ## Русский
 
