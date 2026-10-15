@@ -46,4 +46,4 @@ SetLoop is free and has no ads. If you like it, you can [buy the developer a cof
 
 ## License
 
-Copyright © 2026. All rights reserved. The source code is published for reference only; no license is granted to copy, modify or distribute it.
+Copyright © 2026 Aleksandr Vasilev. All rights reserved. The source code is published for reference only; no license is granted to copy, modify or distribute it. See [LICENSE](LICENSE) and [CONTRIBUTING.md](CONTRIBUTING.md).
