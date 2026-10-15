@@ -5,7 +5,8 @@ SetLoop, including its source code, graphics, icons, sounds, texts and
 other materials in this repository, is proprietary software.
 
 The source code is published for reference only. You may view it and read it
-on GitHub, and you may open issues to report bugs or suggest ideas.
+on GitHub, open issues to report bugs or suggest ideas, and fork it on
+GitHub to prepare pull requests under the terms in CONTRIBUTING.md.
 
 No license is granted to copy, modify, merge, publish, distribute,
 sublicense, sell, or build and distribute derived or rebranded versions of
@@ -13,7 +14,8 @@ this software or any part of it, in source or binary form, without prior
 written permission from the copyright holder.
 
 Forking this repository on GitHub, as permitted by the GitHub Terms of
-Service, does not grant any of the rights listed above.
+Service, does not grant any of the rights listed above beyond preparing
+pull requests.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
