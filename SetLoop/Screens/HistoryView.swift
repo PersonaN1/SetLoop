@@ -65,7 +65,7 @@ struct HistoryView: View {
         let thisWeek = records.filter { week?.contains($0.startedAt) ?? false }
         return VStack(alignment: .leading, spacing: 8) {
             Text("This week").font(.footnote).foregroundStyle(.secondary)
-            HStack {
+            MetricRow {
                 Metric(title: "Workouts", value: "\(thisWeek.count)")
                 Metric(title: "Time", value: WorkoutFormat.longDuration(thisWeek.reduce(0) { $0 + $1.duration }))
             }

@@ -23,10 +23,11 @@ struct RecordDetailView: View {
                         Spacer()
                         StatusBadge(status: record.status)
                     }
-                    HStack {
-                        Metric(title: "Work", value: WorkoutFormat.duration(record.workTime))
-                        Metric(title: "Rest", value: WorkoutFormat.duration(record.restTime))
-                        Metric(title: "Steps", value: "\(record.completedSteps)/\(record.totalSteps)")
+                    MetricRow {
+                        Metric(title: "Work", duration: record.workTime)
+                        Metric(title: "Rest", duration: record.restTime)
+                        Metric(title: "Steps", value: "\(record.completedSteps)/\(record.totalSteps)",
+                               spokenValue: String(localized: "\(record.completedSteps) of \(record.totalSteps)"))
                     }
                     StepStrip(steps: record.steps, colors: workout.colors)
                 }
@@ -95,16 +96,18 @@ private struct StepRow: View {
     let color: Color
 
     var body: some View {
-        HStack {
+        StepLine(name: record.step.name) {
             Circle().fill(color).frame(width: 10, height: 10)
-            Text(record.step.name)
-            Spacer()
+        } detail: {
             // Time actually spent; a step left early also shows its planned length.
             Text(record.outcome == .completed
                  ? WorkoutFormat.duration(record.elapsed)
                  : "\(WorkoutFormat.duration(record.elapsed)) / \(WorkoutFormat.duration(record.step.duration))")
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
+                .accessibilityLabel(record.outcome == .completed
+                    ? WorkoutFormat.spokenDuration(record.elapsed)
+                    : String(localized: "\(WorkoutFormat.spokenDuration(record.elapsed)) of \(WorkoutFormat.spokenDuration(record.step.duration))"))
             outcome
         }
         .opacity(record.outcome == .skipped ? 0.5 : 1)

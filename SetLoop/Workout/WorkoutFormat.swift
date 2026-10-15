@@ -22,6 +22,11 @@ enum WorkoutFormat {
         return Duration.seconds(seconds).formatted(.units(allowed: units, width: .abbreviated))
     }
 
+    /// For VoiceOver: "1 minute, 30 seconds" rather than "one thirty".
+    static func spokenDuration(_ seconds: Int) -> String {
+        Duration.seconds(seconds).formatted(.units(allowed: [.hours, .minutes, .seconds], width: .wide))
+    }
+
     /// "Cycle 2/3 · Set 1/4"; parts that don't apply are omitted.
     static func position(_ position: PlannedStep.Position) -> String {
         var parts: [String] = []

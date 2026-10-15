@@ -84,6 +84,7 @@ struct WorkoutView: View {
             .font(.system(size: digits, weight: .bold, design: .rounded))
             .monospacedDigit()
             .minimumScaleFactor(0.5)
+            .accessibilityLabel(WorkoutFormat.spokenDuration(Int(engine.stepRemaining(at: now).rounded(.up))))
         // Both lines keep their height when empty (a space), so the controls below never jump.
         Text(nonEmpty(WorkoutFormat.position(step.position))).font(.headline)
         Text(nonEmpty(engine.nextStep.map { WorkoutFormat.next($0) })).font(.subheadline)

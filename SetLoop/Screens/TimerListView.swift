@@ -14,6 +14,8 @@ struct TimerListView: View {
     @State private var pendingDelete: PersistentIdentifier?
     @State private var editor: EditorTarget?
     @State private var limitReached = false
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @ScaledMetric private var scaledPlaySize: CGFloat = 44
 
     var body: some View {
         NavigationStack {
@@ -88,13 +90,20 @@ struct TimerListView: View {
                 TimerEditorView(timer: target.timer)
             }
             .timerLimitAlert(isPresented: $limitReached)
+            // Siri learns timer names for "Start <timer> in SetLoop" (SPEC D15).
+            .task(id: timers.map(\.name)) { SetLoopShortcuts.updateAppShortcutParameters() }
         }
     }
 
     private func card(_ timer: SavedTimer) -> some View {
         let definition = timer.definition
+        let playSize = min(scaledPlaySize, 64)
+        // At accessibility sizes the name needs the whole width; the button goes under it.
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 12))
+            : AnyLayout(HStackLayout(spacing: 12))
         return VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 12) {
+            layout {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(timer.name).font(.headline)
                     Text("\(WorkoutFormat.duration(timer.totalDuration)) · \(definition.structureText())")
@@ -102,14 +111,15 @@ struct TimerListView: View {
                         .foregroundStyle(.secondary)
                         .monospacedDigit()
                 }
-                Spacer()
+                if !dynamicTypeSize.isAccessibilitySize { Spacer() }
                 if !editMode.isEditing {
                     Button {
                         workout.start(timer)
                     } label: {
                         Image(systemName: "play.fill")
+                            .font(.system(size: playSize * 0.4))
                             .foregroundStyle(.white)
-                            .frame(width: 44, height: 44)
+                            .frame(width: playSize, height: playSize)
                             .background(Color.accentColor, in: Circle())
                     }
                     // Only the button starts; the row opens the preview (SPEC D9).

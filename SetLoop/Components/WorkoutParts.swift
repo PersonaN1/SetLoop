@@ -39,6 +39,19 @@ struct StatusBadge: View {
 struct Metric: View {
     let title: LocalizedStringKey
     let value: String
+    var spokenValue: String?
+
+    /// A length of time, read out in words by VoiceOver.
+    init(title: LocalizedStringKey, duration: Int) {
+        self.init(title: title, value: WorkoutFormat.duration(duration),
+                  spokenValue: WorkoutFormat.spokenDuration(duration))
+    }
+
+    init(title: LocalizedStringKey, value: String, spokenValue: String? = nil) {
+        self.title = title
+        self.value = value
+        self.spokenValue = spokenValue
+    }
 
     var body: some View {
         VStack(spacing: 2) {
@@ -46,6 +59,21 @@ struct Metric: View {
             Text(title).font(.footnote).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(title))
+        .accessibilityValue(spokenValue ?? value)
+    }
+}
+
+/// Metrics side by side; stacked at accessibility text sizes, where three columns break the digits.
+struct MetricRow<Content: View>: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(spacing: 12))
+            : AnyLayout(HStackLayout())
+        layout { content }
     }
 }
