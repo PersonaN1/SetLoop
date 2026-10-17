@@ -42,7 +42,7 @@ final class WorkoutAudio {
 
     /// Without sound and voice nothing is played, not even silence (TECH T2).
     func begin() {
-        endTask?.cancel()
+        cancelRelease()
         guard settings.soundSet != nil || settings.voicePrompts else { return end() }
         isActive = true
         configure(ducked: false)
@@ -51,7 +51,7 @@ final class WorkoutAudio {
     }
 
     func end() {
-        endTask?.cancel()
+        cancelRelease()
         unduckTask?.cancel()
         guard isActive else { return }
         isActive = false
@@ -112,7 +112,7 @@ final class WorkoutAudio {
         }
         let length = play(.work, set: set)
         guard temporary else { return }
-        endTask?.cancel()
+        cancelRelease()
         endTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(length + 1))
             guard !Task.isCancelled else { return }
@@ -211,6 +211,13 @@ final class WorkoutAudio {
             guard UIApplication.shared.applicationState == .active else { return }
             self.configure(ducked: false)
         }
+    }
+
+    /// A release planned earlier (a preview, a finish signal) must not stop a session started since:
+    /// a cancelled but kept task would also make the next preview inside a workout end it.
+    private func cancelRelease() {
+        endTask?.cancel()
+        endTask = nil
     }
 
     private func release() {
