@@ -223,6 +223,16 @@
         }
       }
     },
+    "A block is a group of steps. Cycles set how many times it runs. Sets repeat the whole workout.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Блок — группа шагов. «Циклы» задают, сколько раз он пройдёт. «Сеты» повторяют всю тренировку."
+          }
+        }
+      }
+    },
     "A timer can have up to %lld blocks.": {
       "localizations": {
         "ru": {
@@ -349,6 +359,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Настройки блока %lld"
+          }
+        }
+      }
+    },
+    "Blocks repeat": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Блоки повторяются"
           }
         }
       }
@@ -843,12 +863,32 @@
         }
       }
     },
+    "Keep it in History": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохраните в историю"
+          }
+        }
+      }
+    },
     "Light": {
       "localizations": {
         "ru": {
           "stringUnit": {
             "state": "translated",
             "value": "Светлая"
+          }
+        }
+      }
+    },
+    "Make a block from steps": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Блок из шагов"
           }
         }
       }
@@ -889,6 +929,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ещё"
+          }
+        }
+      }
+    },
+    "More actions": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ещё действия"
           }
         }
       }
@@ -1259,6 +1309,16 @@
         }
       }
     },
+    "Save, and the workout appears in the History tab with its time, steps and note.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сохранённая тренировка появится во вкладке «История» — со временем, шагами и заметкой."
+          }
+        }
+      }
+    },
     "Seconds": {
       "localizations": {
         "ru": {
@@ -1295,6 +1355,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Выбрать шаги"
+          }
+        }
+      }
+    },
+    "Select neighboring steps and merge them into a block with its own cycles.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Выберите соседние шаги и объедините их в блок со своими циклами."
           }
         }
       }
@@ -1341,6 +1411,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Настройки"
+          }
+        }
+      }
+    },
+    "Show Tips Again": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Показать подсказки снова"
           }
         }
       }
@@ -1445,6 +1525,16 @@
         }
       }
     },
+    "Sounds and voice mark every step. The timer keeps running on the Lock Screen.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Звук и голос отмечают каждый шаг. На заблокированном экране таймер продолжает работать."
+          }
+        }
+      }
+    },
     "Start": {
       "localizations": {
         "ru": {
@@ -1481,6 +1571,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Запустить таймер"
+          }
+        }
+      }
+    },
+    "Start the workout": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Начать тренировку"
+          }
+        }
+      }
+    },
+    "Start with an example": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Начните с примера"
           }
         }
       }
@@ -1551,6 +1661,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Поддержка"
+          }
+        }
+      }
+    },
+    "Swipe a card left to edit, duplicate or delete it. Or touch and hold it.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Смахните карточку влево, чтобы изменить, скопировать или удалить её. Или удерживайте её."
           }
         }
       }
@@ -1944,6 +2064,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "×%lld"
+          }
+        }
+      }
+    },
+    "▶ starts right away. Tap a card to see its steps. Build your own with +.": {
+      "localizations": {
+        "ru": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "▶ запускает сразу. Нажмите на карточку, чтобы увидеть шаги. Свой таймер — кнопка +."
           }
         }
       }

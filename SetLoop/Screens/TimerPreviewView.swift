@@ -1,6 +1,7 @@
 import SetLoopCore
 import SwiftData
 import SwiftUI
+import TipKit
 
 /// Read-only preview with a pinned Start button (DESIGN V9).
 struct TimerPreviewView: View {
@@ -12,6 +13,7 @@ struct TimerPreviewView: View {
     @State private var isEditing = false
     @State private var confirmingDelete = false
     @State private var limitReached = false
+    private let startTip = StartTip()
 
     var body: some View {
         // A deleted model must not be read; the screen is about to close anyway.
@@ -47,13 +49,19 @@ struct TimerPreviewView: View {
             }
         }
         .navigationTitle(timer.name)
+        // Back on the list, the swipe tip may show.
+        .onAppear { CardActionsTip.openedTimer = true }
         .safeAreaInset(edge: .bottom) {
-            Button { workout.start(timer) } label: {
+            Button {
+                startTip.invalidate(reason: .actionPerformed)
+                workout.start(timer)
+            } label: {
                 Label("Start", systemImage: "play.fill")
                     .font(.headline)
                     .frame(maxWidth: .infinity, minHeight: 44)
             }
             .buttonStyle(.borderedProminent)
+            .popoverTip(startTip, arrowEdge: .bottom)
             .disabled(workout.isPresented)
             .padding()
             .background(.bar)

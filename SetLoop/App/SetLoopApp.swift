@@ -7,6 +7,10 @@ struct SetLoopApp: App {
     @State private var settings = AppModel.settings
     @State private var workout = AppModel.workout
 
+    init() {
+        TipsSetup.configure()
+    }
+
     var body: some Scene {
         WindowGroup {
             RootView()
@@ -33,6 +37,7 @@ enum AppModel {
         } catch {
             fatalError("Can't open the store: \(error)")
         }
+        TipsSetup.classifyInstall()
         PresetSeeder.seedIfNeeded(container.mainContext)
         DefaultNames.relocalize(container.mainContext)
         return container
@@ -41,7 +46,7 @@ enum AppModel {
 
 /// Creates the example timers once, on first launch (SPEC D9).
 enum PresetSeeder {
-    private static let key = "didSeedPresets"
+    static let key = "didSeedPresets"
 
     @MainActor
     static func seedIfNeeded(_ context: ModelContext) {
