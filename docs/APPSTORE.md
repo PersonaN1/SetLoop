@@ -14,6 +14,7 @@
 | Privacy Policy URL | https://personan1.github.io/SetLoop/privacy/ |
 | Support URL | https://personan1.github.io/SetLoop/support/ |
 | Marketing URL | https://personan1.github.io/SetLoop/ |
+| Страница в App Store | https://apps.apple.com/ru/app/setloop-timer/id6837319745 |
 | Copyright | 2026 Aleksandr Vasilev (написание — как в аккаунте разработчика) |
 
 ## Русский
@@ -28,7 +29,7 @@
 
 **Ключевые слова:**
 
-табата,кроссфит,emom,бокс,раунды,сеты,отдых,hiit,фитнес
+табата,кроссфит,хиит,бокс,раунды,сеты,отдых,фитнес,зал
 
 **Описание:**
 
@@ -116,7 +117,7 @@ English, в поле App Review Information → Notes:
 
 ## Скриншоты
 
-Готовые снимки 6.9″ (1320×2868, PNG без прозрачности) лежат в `docs/appstore/en/` и `docs/appstore/ru/`; для меньших экранов App Store масштабирует их сам. Загружать в этом порядке:
+Готовые снимки 6.9″ (1320×2868, PNG без прозрачности) лежат в `docs/appstore/en/` и `docs/appstore/ru/`. Для слота «iPhone с Dynamic Island (средний дисплей)» те же кадры лежат в `docs/appstore/en-upload/` и `docs/appstore/ru-upload/` (1206×2622, PNG без прозрачности). Шапка: `docs/appstore/header-3840x1646.png` (3840×1646), уменьшенный просмотр — `docs/appstore/header-preview.jpg`. Загружать в этом порядке:
 
 1. `1-list.png` — список таймеров: каждый таймер — цветная полоса.
 2. `2-overview.png` — обзор таймера: структура и итоги до старта.
