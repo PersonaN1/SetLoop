@@ -1,6 +1,7 @@
 import SetLoopCore
 import SwiftData
 import SwiftUI
+import TipKit
 
 /// Timer editor sheet (SPEC D1, D2, D18; TECH T5): works on a copy, writes only on Done.
 struct TimerEditorView: View {
@@ -21,6 +22,8 @@ struct TimerEditorView: View {
     @State private var selection = Set<UUID>()
     @State private var mergeError: TimerDefinition.MergeError?
     @State private var confirmingDiscard = false
+    private let blockTip = BlockTip()
+    private let mergeTip = MergeTip()
 
     init(timer: SavedTimer?) {
         self.timer = timer
@@ -62,6 +65,12 @@ struct TimerEditorView: View {
                         .nameLimit($name)
                 }
                 general
+                if !editMode.isEditing {
+                    // No row background: the tip draws its own card.
+                    TipView(blockTip)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                }
                 ForEach(draft.blocks) { block in
                     blockSection(block)
                 }
@@ -108,6 +117,8 @@ struct TimerEditorView: View {
             }
         }
         .interactiveDismissDisabled(hasChanges)
+        // The merge tip waits for the next editor visit, not right after the block tip.
+        .onDisappear { if !blockTip.shouldDisplay { MergeTip.blockTipDone = true } }
     }
 
     // MARK: Sections
@@ -236,11 +247,13 @@ struct TimerEditorView: View {
             TimerStrip(definition: cleaned, colors: workout.colors, height: 8)
             HStack {
                 Button(editMode.isEditing ? "Cancel" : "Select Steps") {
+                    mergeTip.invalidate(reason: .actionPerformed)
                     withAnimation {
                         editMode = editMode.isEditing ? .inactive : .active
                         selection = []
                     }
                 }
+                .popoverTip(mergeTip, arrowEdge: .bottom)
                 Spacer()
                 if editMode.isEditing {
                     Button("Merge into Block") { merge() }

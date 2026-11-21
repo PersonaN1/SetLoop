@@ -4,6 +4,8 @@ import SwiftUI
 struct RootView: View {
     @Environment(WorkoutController.self) private var workout
     @Environment(\.scenePhase) private var scenePhase
+    /// "Show Tips Again" rebuilds the tabs so every tip view picks up the new tip IDs.
+    @AppStorage("tipsGeneration") private var tipsGeneration = 0
 
     var body: some View {
         @Bindable var workout = workout
@@ -15,6 +17,7 @@ struct RootView: View {
             SettingsView()
                 .tabItem { Label("Settings", systemImage: "gearshape") }
         }
+        .id(tipsGeneration)
         .fullScreenCover(isPresented: .constant(workout.isPresented)) {
             WorkoutView()
         }

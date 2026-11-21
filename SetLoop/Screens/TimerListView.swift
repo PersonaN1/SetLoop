@@ -1,6 +1,7 @@
 import SetLoopCore
 import SwiftData
 import SwiftUI
+import TipKit
 
 /// Timer cards with preview strips (SPEC D9, DESIGN V4).
 struct TimerListView: View {
@@ -16,47 +17,62 @@ struct TimerListView: View {
     @State private var limitReached = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @ScaledMetric private var scaledPlaySize: CGFloat = 44
+    private let introTip = ListIntroTip()
+    private let cardActionsTip = CardActionsTip()
 
     var body: some View {
         NavigationStack {
             List(selection: $selection) {
-                // Rows are tagged by persistent ID to match the selection (the model's own `id` is a UUID).
-                ForEach(timers, id: \.persistentModelID) { timer in
-                    NavigationLink(value: timer) { card(timer) }
-                        .swipeActions {
-                            // No destructive role: it would remove the row before the confirmation.
-                            Button("Delete", systemImage: "trash") {
-                                pendingDelete = timer.persistentModelID
-                            }
-                            .tint(.red)
-                            Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(timer) }
-                                .tint(.gray)
-                            Button("Edit", systemImage: "pencil") { editor = .edit(timer) }
-                                .tint(.orange)
-                        }
-                        .contextMenu {
-                            Button("Edit", systemImage: "pencil") { editor = .edit(timer) }
-                            Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(timer) }
-                            Button("Delete", systemImage: "trash", role: .destructive) {
-                                pendingDelete = timer.persistentModelID
-                            }
-                        }
-                        // On the row, so the iOS 26+ popover points at the timer being deleted.
-                        .confirmationDialog(
-                            "Delete this timer?",
-                            isPresented: Binding(
-                                get: { pendingDelete == timer.persistentModelID },
-                                set: { if !$0 { pendingDelete = nil } }
-                            ),
-                            titleVisibility: .visible
-                        ) {
-                            Button("Delete", role: .destructive) { context.delete(ids: [timer.persistentModelID]) }
-                        } message: {
-                            Text("Workouts in History stay.")
-                        }
+                if !editMode.isEditing && !timers.isEmpty {
+                    // Own section with no row background: the tip draws its own card.
+                    Section {
+                        TipView(introTip)
+                        TipView(cardActionsTip)
+                    }
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
                 }
-                .onMove(perform: move)
+                // Rows are tagged by persistent ID to match the selection (the model's own `id` is a UUID).
+                Section {
+                    ForEach(timers, id: \.persistentModelID) { timer in
+                        NavigationLink(value: timer) { card(timer) }
+                            .swipeActions {
+                                // No destructive role: it would remove the row before the confirmation.
+                                Button("Delete", systemImage: "trash") {
+                                    cardActionsTip.invalidate(reason: .actionPerformed)
+                                    pendingDelete = timer.persistentModelID
+                                }
+                                .tint(.red)
+                                Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(timer) }
+                                    .tint(.gray)
+                                Button("Edit", systemImage: "pencil") { edit(timer) }
+                                    .tint(.orange)
+                            }
+                            .contextMenu {
+                                Button("Edit", systemImage: "pencil") { edit(timer) }
+                                Button("Duplicate", systemImage: "plus.square.on.square") { duplicate(timer) }
+                                Button("Delete", systemImage: "trash", role: .destructive) {
+                                    pendingDelete = timer.persistentModelID
+                                }
+                            }
+                            // On the row, so the iOS 26+ popover points at the timer being deleted.
+                            .confirmationDialog(
+                                "Delete this timer?",
+                                isPresented: Binding(
+                                    get: { pendingDelete == timer.persistentModelID },
+                                    set: { if !$0 { pendingDelete = nil } }
+                                ),
+                                titleVisibility: .visible
+                            ) {
+                                Button("Delete", role: .destructive) { context.delete(ids: [timer.persistentModelID]) }
+                            } message: {
+                                Text("Workouts in History stay.")
+                            }
+                    }
+                    .onMove(perform: move)
+                }
             }
+            .onTipInvalidated(introTip) { CardActionsTip.introDone = true }
             .overlay {
                 if timers.isEmpty {
                     ContentUnavailableView {
@@ -136,7 +152,14 @@ struct TimerListView: View {
         if timers.count >= Limits.maxTimers { limitReached = true } else { editor = .new }
     }
 
+    /// Swipe and context menu actions: the user has found them, the tip is done.
+    private func edit(_ timer: SavedTimer) {
+        cardActionsTip.invalidate(reason: .actionPerformed)
+        editor = .edit(timer)
+    }
+
     private func duplicate(_ timer: SavedTimer) {
+        cardActionsTip.invalidate(reason: .actionPerformed)
         if !context.duplicate(timer) { limitReached = true }
     }
 

@@ -59,6 +59,8 @@ struct SettingsView: View {
                 Section("About") {
                     Link("Privacy Policy", destination: SupportLinks.privacy)
                     Link("Support", destination: SupportLinks.support)
+                    // Rebuilds the tabs and lands on Timers, where the first tip is.
+                    Button("Show Tips Again") { TipsSetup.showAgain() }
                     LabeledContent("Version", value: Bundle.main.versionString)
                 }
             }

@@ -1,6 +1,7 @@
 import SetLoopCore
 import SwiftData
 import SwiftUI
+import TipKit
 
 /// Shown after the last step or an early finish: save to history or discard (SPEC D10, DESIGN V5).
 struct SummaryView: View {
@@ -13,6 +14,7 @@ struct SummaryView: View {
     @State private var savedCount = 0
     /// A double tap must not insert the record twice.
     @State private var isSaved = false
+    private let historyTip = HistoryTip()
 
     private var historyFull: Bool { savedCount >= Limits.maxHistoryRecords }
 
@@ -24,6 +26,7 @@ struct SummaryView: View {
                     metrics
                     StepStrip(steps: summary.steps, colors: workout.colors)
                     fields
+                    TipView(historyTip)
                     if historyFull { fullHint }
                 }
                 .padding()
@@ -103,6 +106,7 @@ struct SummaryView: View {
     private func save() {
         guard !isSaved else { return }
         isSaved = true
+        historyTip.invalidate(reason: .actionPerformed)
         if historyFull { removeOldest(savedCount - Limits.maxHistoryRecords + 1) }
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         context.insert(WorkoutRecord(
