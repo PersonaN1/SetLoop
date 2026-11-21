@@ -5,7 +5,7 @@
 <p align="center">Interval timer for iPhone — blocks, sets, any combination.<br>
 <a href="https://personan1.github.io/SetLoop/">Website</a> · <a href="https://t.me/setnewloop">Telegram</a> · <a href="https://personan1.github.io/SetLoop/support/">Support</a> · <a href="https://personan1.github.io/SetLoop/privacy/">Privacy</a></p>
 
-**Status:** in development, coming soon to the App Store.
+**Status:** available on the App Store — [SetLoop](https://apps.apple.com/ru/app/setloop-timer/id6837319745).
 
 <p align="center">
 <img src="site/screens/en-1-list.jpg" width="200" alt="Timer list">

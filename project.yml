@@ -52,6 +52,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: io.github.personan1.setloop
+        TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
   SetLoopWidgets:
@@ -77,6 +78,7 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: io.github.personan1.setloop.widgets
+        TARGETED_DEVICE_FAMILY: "1"
 schemes:
   SetLoop:
     build:
