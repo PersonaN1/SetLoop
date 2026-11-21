@@ -86,3 +86,4 @@ html.js [data-lang]:not(.shown) { display: none; }
 .strip { display: flex; gap: 2px; height: 12px; border-radius: 6px; overflow: hidden; }
 .strip i { display: block; min-width: 2px; border-radius: 2px; }
 .telegram .button { margin-top: 4px; }
+.store { margin-top: 16px; }
