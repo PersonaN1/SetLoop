@@ -85,5 +85,5 @@ html.js [data-lang]:not(.shown) { display: none; }
 .how .repeat { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
 .strip { display: flex; gap: 2px; height: 12px; border-radius: 6px; overflow: hidden; }
 .strip i { display: block; min-width: 2px; border-radius: 2px; }
-.telegram .button { margin-top: 4px; }
+.telegram .button, .sibling .button { margin-top: 4px; }
 .store { margin-top: 16px; }
