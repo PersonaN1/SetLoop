@@ -6,18 +6,18 @@
 <title>SetLoop — Support</title>
 <meta name="title-en" content="SetLoop — Support">
 <meta name="title-ru" content="SetLoop — Поддержка">
-<meta name="description" content="Help with SetLoop: answers to common questions and how to report a problem.">
+<meta name="description" content="Help with SetLoop for iPhone and Android: answers to common questions and how to report a problem.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SetLoop">
 <meta property="og:title" content="SetLoop — Support">
-<meta property="og:description" content="Help with SetLoop: common questions and how to contact the developer.">
+<meta property="og:description" content="Help with SetLoop on iPhone and Android: common questions and how to contact the developer.">
 <meta property="og:url" content="https://personan1.github.io/SetLoop/support/">
 <meta property="og:image" content="https://personan1.github.io/SetLoop/social-preview.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="640">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="../icon.png">
-<link rel="stylesheet" href="../style.css?v=2">
+<link rel="stylesheet" href="../style.css?v=3">
 <script src="../lang.js"></script>
 </head>
 <body>
@@ -34,10 +34,10 @@
     <h1>Support</h1>
     <p>Found a bug, have a question or an idea? Write to us in Telegram — news about the app is posted there too.</p>
     <p><a class="button" href="https://t.me/setnewloop">Write in Telegram</a></p>
-    <p>If you have a GitHub account, you can also <a href="https://github.com/PersonaN1/SetLoop/issues/new">open an issue</a> (issues are public, so don't post personal information).</p>
-    <p class="muted">Please include your iPhone model, iOS version and the app version (Settings → About in SetLoop).</p>
+    <p>If you have a GitHub account, you can also <a href="https://github.com/PersonaN1/SetLoop/issues/new">open an issue</a> (iPhone) or <a href="https://github.com/PersonaN1/SetLoop-Android/issues/new">an issue for Android</a>. Issues are public, so don't post personal information.</p>
+    <p class="muted">Please include your phone model, iOS or Android version (for Android also the maker, such as Xiaomi or Samsung) and the app version (Settings → About in SetLoop).</p>
 
-    <h2>Common questions</h2>
+    <h2>Common questions (iPhone)</h2>
 
     <div class="card">
       <h2>I don't hear the sounds</h2>
@@ -65,6 +65,34 @@
       <p>Timers and history are part of your device backup: restore the new iPhone from an iCloud or computer backup. Sync between devices is planned for a future version.</p>
     </div>
 
+    <h2 id="android">Android</h2>
+    <div class="card">
+      <h2>The timer stops when the screen is off or the app is in the background</h2>
+      <p>Some phones close background apps to save battery. SetLoop runs a workout as a foreground service with a notification, but a strict battery mode can still stop it. Set the battery option for SetLoop to <b>No restrictions</b>:</p>
+      <ul>
+        <li><b>Any Android:</b> Settings → Apps → SetLoop → Battery → Unrestricted (or "Don't optimize").</li>
+        <li><b>Xiaomi / Redmi / POCO (HyperOS, MIUI):</b> Settings → Apps → Manage apps → SetLoop → Battery saver → No restrictions. Also turn on Autostart for SetLoop.</li>
+        <li><b>Huawei / Honor:</b> Settings → Battery → App launch → SetLoop → switch to Manage manually and allow Auto-launch, Secondary launch and Run in background.</li>
+        <li><b>Samsung (One UI):</b> Settings → Apps → SetLoop → Battery → Unrestricted. Also remove SetLoop from Settings → Battery → Background usage limits → Sleeping apps.</li>
+      </ul>
+      <p>Menu names differ between versions. The app warns you before a workout if the battery setting is "Restricted". See also <a href="https://dontkillmyapp.com">dontkillmyapp.com</a> for per-maker guides.</p>
+    </div>
+
+    <div class="card">
+      <h2>There is no countdown notification</h2>
+      <p>On Android 13 and newer SetLoop asks for the notification permission. If you declined it, open Settings → Apps → SetLoop → Notifications and allow them. The permission is used only to show the workout countdown with Pause and Skip. Also check that the "Show on Lock Screen" setting in SetLoop is on if you want to see it on a locked phone.</p>
+    </div>
+
+    <div class="card">
+      <h2>I can't install the APK</h2>
+      <p>Allow installing apps from your browser or file manager (Settings → Apps → Special access → Install unknown apps), then open the file again. The SHA-256 checksum is on the <a href="https://github.com/PersonaN1/SetLoop-Android/releases/latest">release page</a>. The app needs Android 8.0 or newer.</p>
+    </div>
+
+    <div class="card">
+      <h2>Where do I report an Android bug?</h2>
+      <p>Open an issue in the <a href="https://github.com/PersonaN1/SetLoop-Android/issues">Android repository</a> or write to <a href="https://t.me/setnewloop">@setnewloop</a> in Telegram. Please name the phone model, maker and Android version.</p>
+    </div>
+
     <h2>Privacy</h2>
     <p>SetLoop collects no data. Details: <a href="../privacy/">Privacy Policy</a>.</p>
   </article>
@@ -73,10 +101,10 @@
     <h1>Поддержка</h1>
     <p>Нашли ошибку, есть вопрос или идея? Напишите нам в Telegram — там же новости приложения.</p>
     <p><a class="button" href="https://t.me/setnewloop">Написать в Telegram</a></p>
-    <p>Если у вас есть аккаунт GitHub, можно также <a href="https://github.com/PersonaN1/SetLoop/issues/new">создать обращение</a> (обращения публичны, не пишите в них личные данные).</p>
-    <p class="muted">Укажите модель iPhone, версию iOS и версию приложения (в SetLoop: «Настройки» → «О приложении»).</p>
+    <p>Если у вас есть аккаунт GitHub, можно также <a href="https://github.com/PersonaN1/SetLoop/issues/new">создать обращение</a> (iPhone) или <a href="https://github.com/PersonaN1/SetLoop-Android/issues/new">обращение для Android</a>. Обращения публичны, не пишите в них личные данные.</p>
+    <p class="muted">Укажите модель телефона, версию iOS или Android (для Android также производителя, например Xiaomi или Samsung) и версию приложения (в SetLoop: «Настройки» → «О приложении»).</p>
 
-    <h2>Частые вопросы</h2>
+    <h2>Частые вопросы (iPhone)</h2>
 
     <div class="card">
       <h2>Не слышно звуков</h2>
@@ -102,6 +130,34 @@
     <div class="card">
       <h2>Как перенести таймеры на новый iPhone?</h2>
       <p>Таймеры и история входят в резервную копию устройства: восстановите новый iPhone из копии iCloud или компьютера. Синхронизация между устройствами запланирована в одной из следующих версий.</p>
+    </div>
+
+    <h2 id="android">Android</h2>
+    <div class="card">
+      <h2>Таймер останавливается при выключенном экране или в фоне</h2>
+      <p>Некоторые телефоны закрывают фоновые приложения, чтобы экономить заряд. SetLoop ведёт тренировку как служба переднего плана с уведомлением, но строгий режим батареи всё равно может её остановить. Установите для SetLoop режим батареи <b>Без ограничений</b>:</p>
+      <ul>
+        <li><b>Любой Android:</b> «Настройки» → «Приложения» → SetLoop → «Батарея» → «Без ограничений» (или «Не оптимизировать»).</li>
+        <li><b>Xiaomi / Redmi / POCO (HyperOS, MIUI):</b> «Настройки» → «Приложения» → «Все приложения» → SetLoop → «Контроль активности» (или «Экономия заряда») → «Нет ограничений». Также включите «Автозапуск» для SetLoop.</li>
+        <li><b>Huawei / Honor:</b> «Настройки» → «Батарея» → «Запуск приложений» → SetLoop → переключите на «Управлять вручную» и разрешите автозапуск, косвенный запуск и работу в фоновом режиме.</li>
+        <li><b>Samsung (One UI):</b> «Настройки» → «Приложения» → SetLoop → «Батарея» → «Без ограничений». Также уберите SetLoop из «Настройки» → «Батарея» → «Ограничения фоновой работы» → «Неиспользуемые приложения» (спящие).</li>
+      </ul>
+      <p>Названия пунктов зависят от версии прошивки. Перед тренировкой приложение предупредит, если для него выбран режим «Ограничено». Руководства по производителям — на <a href="https://dontkillmyapp.com">dontkillmyapp.com</a>.</p>
+    </div>
+
+    <div class="card">
+      <h2>Нет уведомления с отсчётом</h2>
+      <p>На Android 13 и новее SetLoop запрашивает разрешение на уведомления. Если вы отказали, откройте «Настройки» → «Приложения» → SetLoop → «Уведомления» и разрешите их. Разрешение нужно только для показа отсчёта тренировки с кнопками паузы и пропуска. Чтобы видеть его на заблокированном телефоне, также проверьте, что в настройках SetLoop включено «Показывать на экране блокировки».</p>
+    </div>
+
+    <div class="card">
+      <h2>Не получается установить APK</h2>
+      <p>Разрешите установку приложений из вашего браузера или файлового менеджера («Настройки» → «Приложения» → «Особый доступ» → «Установка неизвестных приложений») и откройте файл снова. Контрольная сумма SHA-256 указана на <a href="https://github.com/PersonaN1/SetLoop-Android/releases/latest">странице релиза</a>. Нужен Android 8.0 или новее.</p>
+    </div>
+
+    <div class="card">
+      <h2>Куда сообщить об ошибке в Android-версии?</h2>
+      <p>Создайте обращение в <a href="https://github.com/PersonaN1/SetLoop-Android/issues">репозитории Android</a> или напишите в Telegram: <a href="https://t.me/setnewloop">@setnewloop</a>. Укажите модель телефона, производителя и версию Android.</p>
     </div>
 
     <h2>Конфиденциальность</h2>
